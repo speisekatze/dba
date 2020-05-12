@@ -2,11 +2,6 @@ html {
   height: 101%;
 }
 
-.materneModus {
-  margin: 0;
-  padding: 0;
-}
-
 body {
   background-color: #EEF3F7;
   background-image: url(img/background_ball.jpg);
@@ -101,23 +96,6 @@ th.tableheader {
 /*  font-size: 12px; */
 }
 
-label {
-  margin: .1em;
-  vertical-align: middle;
-}
-
-label.normal {
-  margin-right: 1em;
-  vertical-align: middle;
-}
-
-label.loginleft {
-  float: left;
-  text-align: right;
-  width: 8em;
-  margin-right: 2em;
-}
-
 .row {
   width: 100%;
   margin: 0;
@@ -173,10 +151,10 @@ span.bolditalic {
   width: auto;
   margin: 0;
   padding: 0;
-  /*
-  border-style: solid solid solid solid;
-  border-width: 1px;
-  border-color: #000000; */
+  margin-left: 1px;
+  background: #FFFFFF url(img/bgright.jpg) repeat-y scroll right;
+  width: 100%;
+  min-width: 975px;
   border: 0;
 }
 
@@ -194,13 +172,6 @@ br.end {
   width: 70px;
   height: 70px;
   z-index: 999;
-}
-
-#main {
-  margin-left: 1px;
-  background: #FFFFFF url(img/bgright.jpg) repeat-y scroll right;
-  width: 100%;
-  min-width: 975px;
 }
 
 #content {
@@ -357,6 +328,8 @@ label {
   color: #000;
   font-weight: normal;
   padding-top: 0.3em;
+  margin: .1em;
+  vertical-align: middle;
 }
 
 label.left {
@@ -378,6 +351,18 @@ label.right {
   text-align: right;
   color: #000;
   margin-left: 2em;
+}
+
+label.normal {
+  margin-right: 1em;
+  vertical-align: middle;
+}
+
+label.loginleft {
+  float: left;
+  text-align: right;
+  width: 8em;
+  margin-right: 2em;
 }
 
 #ldeHilfeContainer {
@@ -705,10 +690,6 @@ select,input[type=radio],input[type=checkbox],input[type=text],input[type=passwo
 
 input[type="radio"],input[type="checkbox"] {
   border:none;
-}
-
-input[type="radio"],
-input[type="checkbox"] {
   margin-top: 0.4em;
 }
 
@@ -916,10 +897,6 @@ div.strukturPersonListe {
   padding: 5px;
 }
 
-span.anzeigeList {
-  
-}
-
 span.anzeigeListX {
   color: green;
 }
@@ -951,11 +928,6 @@ span.anzeigeListX {
 }
 
 #dokOptDokgruppe {
-  visibility: hidden;
-  display: none;
-}
-
-#dokOptAdressAuswahl {
   visibility: hidden;
   display: none;
 }
