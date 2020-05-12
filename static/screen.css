@@ -148,7 +148,6 @@ span.bolditalic {
 }
 
 #main {
-  width: auto;
   margin: 0;
   padding: 0;
   margin-left: 1px;
@@ -1535,8 +1534,7 @@ div.tooltip:hover div.frameContainer {
   #newNodeForm,
   div.frameContainer,
   div.dataContainer,
-  div.hpvMenuStandContainer,
-  !div.tooltip>div.frameContainer
+  div.hpvMenuStandContainer
   {
     width: fit-content !important;
     max-width: 90vw;
@@ -1589,7 +1587,6 @@ div.tooltip:hover div.frameContainer {
     margin-left: auto !important;
     margin-right: auto !important;
     margin-top: 5px !important;
-    horiz-align: center;
     min-height: 170px !important;
   }
   .cardHorizCentered:first-child{
@@ -2025,9 +2022,7 @@ div.tooltip:hover div.frameContainer {
     width: calc(50% - 2rem) !important;
     overflow-wrap: break-word;
   }
-  table tr td{
-    /*display: flex;*/
-  }
+
   table tr td label.left{
     width: 100% !important;
   }
