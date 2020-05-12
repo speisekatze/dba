@@ -3,7 +3,7 @@
 <html lang="{{ LANGUAGE_CODE }}">
   <head>
     <meta charset="utf-8">
-    <title>{% block title %}{% endblock title %}{% block title-page %}{% endblock title-page %} - DBA</title>
+    <title>{{ headline }} - {{ seite }} - DBA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="DBA Tools" />
     <meta name="keywords" content="" />
@@ -15,32 +15,44 @@
     {% block link %}{% endblock link %}
     {% block script %}{% endblock script %}
   </head>
-  <body class="default blue">
-    <div class="container">
-      <header id="header" role="banner">
-        <nav>
-          <ul class="top-navigation">
-            <li>
-              <a href="" title="" class="">
-                A
-              </a>
-            </li>
-            <li>
-              <a href="" title="" class="">
-                B
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </header>
-      <div id="content" class="hfeed" role="main">
-        {% block content %}
-        <p>Placeholder text in base template. Replace with page content.</p>
-        {% endblock content %}
-      </div>
-      <footer id="footer" role="contentinfo">
+  <body>
+    <div class="main" id="main">
+        <div id="layout_bg">
+            <div id="header">
+                <div id="header_left">
+                    <div id="header_headline">{{ headline }} - {{ seite }} - DBA</div>
+                </div>
+                <div id="header_right"></div>
+            </div>
+            <div id="content">
+                <div id="currentStateMenu" style="width:10%">
+                    <div class="currentStateMenuButton">
+                        <a href="../?sid=d318c080c4fdbb937eee6fa380f0f6c2dbf7f4d2" title="Zurück">
+                          <img src="{% static "img/cancel_menu.png" %}" alt=""><br>
+                          Zurück
+                        </a>
+                    </div>
+                    <br class="end"><br>
+                </div>
+                <div style="display: block; float: left;">
+                        {% block content %}
+                        <p>Placeholder text in base template. Replace with page content.</p>
+                        {% endblock content %}
+                </div>
+            </div>
+            <div id="footer">
+                <div id="footer_left">
+                 <span class="footer_headline" style="color:lightslategrey;">Copyright LogoData ERFURT GmbH 2008, 2020</span>
+                </div>
+                <div id="footer_right"></div>
+                <div id="errorHandlerFootDiv" style="visibility:hidden; display:none;  position:absolute; z-index:550; right:20px;">
+                 <input id="errorHandlerFootShow" type="button" class="navigationButton" style="background-image: url(../layout/ldeLayout/mail.png); z-index: 50;font-size:11px; height: 13px; color:black; padding-left: 18px; margin: 10px 0px 0px 0px;width:160px; color:lightslategray;" value="Einen Fehler melden">
+               </div>
+               </div>
+        </div>
+    </div>
+    <footer id="django" role="contentinfo">
         <p>Powered by <a href="http://www.djangoproject.com">Django</a>.</p>
       </footer>
-    </div>
   </body>
 </html>
