@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'dba.urls'
+ROOT_URLCONF = 'tools.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'dba.wsgi.application'
+WSGI_APPLICATION = 'tools.wsgi.application'
 
 
 # Database
@@ -121,5 +121,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'dba/static'),
+    os.path.join(BASE_DIR, 'tools/static'),
 ]
