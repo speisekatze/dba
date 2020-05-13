@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if latest_question_list %}
+{% if host_list %}
     <ul>
-    {% for question in latest_question_list %}
-        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+    {% for host in host_list %}
+        <li>{{ host.name }} - {{ host.fqdn }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>No polls are available.</p>
+    <p>Keine Hosts konfiguriert.</p>
 {% endif %}
 {% endblock content %}
