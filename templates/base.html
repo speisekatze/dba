@@ -12,6 +12,7 @@
     <link rel="shortcut icon" href="" />
     <link rel="home" href="" />
     <link rel="stylesheet" type="text/css" media="screen, projection" href="{% static "screen.css" %}" />
+    <script type="text/javascript" src="{% static "js/jquery.slim.js" %}"></script>
     {% block link %}{% endblock link %}
     {% block script %}{% endblock script %}
   </head>
@@ -34,7 +35,7 @@
                     </div>
                     <br class="end"><br>
                 </div>
-                <div style="display: block; float: left;">
+                <div style="display: block; width:88%; min-width:800px; float:left;">
                         {% block content %}
                         <p>Placeholder text in base template. Replace with page content.</p>
                         {% endblock content %}

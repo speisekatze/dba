@@ -1,13 +1,84 @@
 {% extends 'base.html' %}
 
+{% block script %}
+<script>
+    $( document ).ready(function() {
+        $('#hosts').bind("change", { 
+            msg:"hostchange" 
+        },function(event) { 
+            $('#sucheForm').submit();
+        });
+    });
+</script>
+
+{% endblock script %}
 {% block content %}
-{% if host_list %}
+{% if debugmessage %}
+<fieldset>
+    <pre>
+    {{debugmessage}}
+    </pre>
+</fieldset>
+{% endif %}
+<form id="sucheForm" action="/" method="post">
+{% csrf_token %}
+<h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
+    <span class="headline" style="text-align:left;width:80%;">Voreinstellungen</span>
+   </h3>
+   <div id="einstellungMenuListe" class="menuExpandStatic" style="padding-top:5px;">
+    <div style="float:left;width:400px;">
+     <label class="left" for="suche" style="width:80px;">Suchen:</label>
+     <div id="klientListeDiv" style="float:left;">
+      <input type="text" name="suche" value="" id="such">
+     </div>
+     <br class="end">
+     <label class="left" style="width:80px;">Server:</label>
+        <select name="hosts" id="hosts" style="float:left;">
+            <option value="">Bitte einen Server wählen</option>
+            {% if host_list %}
+                {% for host in host_list %}
+                <option value="{{ host.name }}" {{ host.selected }}>{{ host.fqdn }} ({{host.driver}})</option>
+                {% endfor %}
+            {% else %}
+                <option value="">Keine Hosts konfiguriert</option>
+            {% endif %}
+        </select>
+     <br class="end">
+     {% if instance_list %}
+     <label class="left" style="width:80px;">Instanz:</label>
+        <select name="instances" id="instances" style="float:left;">
+            <option value="">Bitte eine Instanz wählen</option>
+                {% for instance in instance_list %}
+                <option value="{{ instance.name }}" {{ instance.selected }}>{{ instance.name }}</option>
+                {% endfor %}
+        </select>
+        {% endif %}
+     <br class="end">
+    </div>
+    <div style="float:left;width:400px;">
+     <label class="left" for="suchenIn" style="margin-right:1em;margin-left:1em;width:100px;">Suchen in:</label>
+     <select name="suchenIn" id="suchenIn" style="float:left;">
+        <option value="alles">Alles (Namen/Akz/Anschrift)</option>
+     </select>
+     <br class="end">
+     <label class="left" for="fallart" style="margin-right:1em;margin-left:1em;width:100px">Zuständigkeit:</label>
+     <select name="fallart" id="fallart" style="float:left;">
+      <option title="Alle Fälle" value="alle" selected="selected">Alle Fälle</option>
+     </select>
+    </div>
+    <br class="end">
+    <input type="submit" name="suchen" value="Suchen" style="background-image: url(../layout/ldeLayout/suchen.png);margin-left:65px;" class="navigationButton">
+    <input type="submit" name="nichtsuchen" value="Alles zeigen" style="background-image: url(../layout/ldeLayout/sumliste.png);" class="navigationButton">
+    <br class="end">
+   </div>
+{% if db_list %}
     <ul>
-    {% for host in host_list %}
-        <li>{{ host.name }} - {{ host.fqdn }}</a></li>
+    {% for db in db_list %}
+        <li>{{ db.0 }} - {{ db.1 }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>Keine Hosts konfiguriert.</p>
 {% endif %}
+</form>
 {% endblock content %}
