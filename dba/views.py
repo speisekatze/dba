@@ -64,26 +64,7 @@ class IndexView(generic.FormView):
         return content
 
     def get_db_list(self, host, instance=None):
-        conf = {}
-        for item in self.conf['dba']['database']['hosts']:
-            if item['name'] == host:
-                conf['server'] = item['fqdn']
-                conf['driver'] = item['driver']
-                if instance is not None:
-                    if 'instances' in item:
-                        for inst in item['instances']:
-                            if instance == inst['name']:
-                                conf['instance'] = inst
-                    else:
-                        # Error
-                        print('Fehler')
-                conf['user'] = item['user']
-                conf['password'] = item['password']
-                if 'instance' in conf:
-                    if 'user' in conf['instance'] and 'password' in conf['instance']:
-                        conf['user'] = conf['instance']['user']
-                        conf['password'] = conf['instance']['password']
-                    conf['instance'] = conf['instance']['name']
+        conf = prepare_config(self.conf, host, instance)
         if conf['driver'] == 'MSSQL':
             db = mssql
         else:
@@ -91,3 +72,33 @@ class IndexView(generic.FormView):
         connection = db.create(conf)
         itemlist = db.query(connection, 'db_list_size')
         return itemlist
+
+
+def prepare_config(configuration, host, instance=None):
+    conf = {}
+    for item in configuration['dba']['database']['hosts']:
+        if item['name'] == host:
+            conf['server'] = item['fqdn']
+            conf['driver'] = item['driver']
+            if instance is not None:
+                conf['instance'] = prepare_instance_config(item, instance)
+            conf['user'] = item['user']
+            conf['password'] = item['password']
+            if 'instance' in conf:
+                if 'user' in conf['instance'] and 'password' in conf['instance']:
+                    conf['user'] = conf['instance']['user']
+                    conf['password'] = conf['instance']['password']
+                conf['instance'] = conf['instance']['name']
+    return conf
+
+
+def prepare_instance_config(item, instance):
+    conf = None
+    if 'instances' in item:
+        for inst in item['instances']:
+            if instance == inst['name']:
+                conf = inst
+    else:
+        # Error
+        print('Fehler')
+    return conf
