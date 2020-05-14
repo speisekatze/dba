@@ -40,12 +40,11 @@ def create(config):
 def load_table(connection, table, where='', fields='*'):
     query = None
     result = None
-    sSQL = 'SELECT '+fields+' FROM ' + table
+    sql = 'SELECT '+fields+' FROM ' + table
     if where != '':
-        sSQL += ' WHERE ' + where
-    # sSQL += ";"
+        sql += ' WHERE ' + where
     load_cursor = connection.cursor()
-    query = load_cursor.execute(sSQL)
+    query = load_cursor.execute(sql)
     if query:
         result = query.fetchall()
     load_cursor.close()
@@ -53,21 +52,18 @@ def load_table(connection, table, where='', fields='*'):
 
 
 def find_in_table(connection, table, where, data):
-    sSQL = 'SELECT * FROM '+table+' WHERE '+where
-    # print(sSQL)
-    # print(data)
-    # print('------')
+    sql = 'SELECT * FROM '+table+' WHERE '+where
     find_cursor = connection.cursor()
-    result = find_cursor.execute(sSQL, data).fetchall()
+    result = find_cursor.execute(sql, data).fetchall()
     find_cursor.close()
     return result
 
 
 def query(connection, query_name):
     result = None
-    sSQL = queries[query_name]
+    sql = queries[query_name]
     cursor = connection.cursor()
-    query = cursor.execute(sSQL)
+    query = cursor.execute(sql)
     if query:
         result = query.fetchall()
     cursor.close()
