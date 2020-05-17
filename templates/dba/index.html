@@ -80,14 +80,15 @@
     <div class="scrollTableContainer" style="float: left; width: 100%; height: 800px;">
 {% if db_list %}
     <table class="ldeTable" style="width: 100%;">
+        <caption>Datenbankliste</caption>
         <thead>
             <tr>
-                <th widht="16%">Name</th>
-                <th style="text-align: right;">Daten</th>
-                <th style="text-align: right;">Log</th>
-                <th style="text-align: right;">Gesamt</th>
-                <th>Vernichtung</th>
-                <th>Wiederherstellungsmodell</th>
+                <th id="tblName" widht="16%">Name</th>
+                <th id="tblSize" style="text-align: right;">Daten</th>
+                <th id="tblLog" style="text-align: right;">Log / Temp</th>
+                <th id="tblSum" style="text-align: right;">Gesamt</th>
+                <th id="tblDelete">Vernichtung</th>
+                <th id="tblInfo">Informationen</th>
             </tr>
         </thead>
         <tbody>

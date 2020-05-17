@@ -4,7 +4,7 @@ from datetime import date
 # maybe later - reverse
 from django.views import generic
 from src.config import config
-from src.db import mssql, mysql
+from src.db import mssql, mysql, oracle
 from .forms import SucheForm
 
 
@@ -87,10 +87,12 @@ class IndexView(generic.FormView):
             db = mssql
         elif conf['driver'] == 'MySQL':
             db = mysql
+        elif conf['driver'] == 'Oracle':
+            db = oracle
         else:
             db = None
         connection = db.create(conf)
-        itemlist = db.query(connection, 'db_list_size')
+        itemlist = db.query(connection, 'db_list_size', {})
         return itemlist
 
 
