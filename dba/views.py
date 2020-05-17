@@ -1,9 +1,10 @@
 # maybe later - get_object_or_404
 from django.shortcuts import render
+from datetime import date
 # maybe later - reverse
 from django.views import generic
 from src.config import config
-from src.db import mssql
+from src.db import mssql, mysql
 from .forms import SucheForm
 
 
@@ -38,7 +39,24 @@ class IndexView(generic.FormView):
         context['seite'] = 'Übersicht'
         context['instance_list'] = self.get_instance_list(host, instance)
         if (request.POST.get('suchen') == 'Suchen'):
-            context['db_list'] = self.get_db_list(host, instance)
+            dbt = connect_dbt(self.conf)
+            db_tuples = self.get_db_list(host, instance)
+            context['db_list'] = []
+            for db in db_tuples:
+                items = {}
+                info = mysql.query(dbt, 'find_db_dbt', ('%'+db[0]+'%',))
+                items['name'] = db[0]
+                items['size'] = db[1]
+                items['log'] = db[2]
+                items['sum'] = db[3]
+                items['add'] = db[4]
+                if info:
+                    items['delete'] = date.fromtimestamp(info[0][0])
+                    items['delta'] = (items['delete'] - date.today()).days
+                else:
+                    items['delete'] = 'nicht gefunden'
+                    items['delta'] = -9000
+                context['db_list'].append(items)
         return render(request, self.template_name, context)
 
     def get_instance_list(self, host, selected=None):
@@ -67,6 +85,8 @@ class IndexView(generic.FormView):
         conf = prepare_config(self.conf, host, instance)
         if conf['driver'] == 'MSSQL':
             db = mssql
+        elif conf['driver'] == 'MySQL':
+            db = mysql
         else:
             db = None
         connection = db.create(conf)
@@ -80,6 +100,7 @@ def prepare_config(configuration, host, instance=None):
         if item['name'] == host:
             conf['server'] = item['fqdn']
             conf['driver'] = item['driver']
+            conf['database'] = ''
             if instance is not None:
                 conf['instance'] = prepare_instance_config(item, instance)
             conf['user'] = item['user']
@@ -102,3 +123,14 @@ def prepare_instance_config(item, instance):
         # Error
         print('Fehler')
     return conf
+
+
+def connect_dbt(conf):
+    print()
+    dbt_conf = {
+        'user': conf['dba']['dbt']['user'],
+        'password': conf['dba']['dbt']['password'],
+        'server': conf['dba']['dbt']['fqdn'],
+        'database': conf['dba']['dbt']['database']
+    }
+    return mysql.create(dbt_conf)

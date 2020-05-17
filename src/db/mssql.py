@@ -3,8 +3,10 @@ import pyodbc
 queries = {
     'db_list_size': "SELECT \
     DB_NAME(db.database_id) DatabaseName, \
-    (CAST(mfrows.RowSize AS FLOAT)*8)/1024 RowSizeMB, \
-    (CAST(mflog.LogSize AS FLOAT)*8)/1024 LogSizeMB \
+    ROUND((CAST(mfrows.RowSize AS FLOAT)*8)/1024,2) RowSizeMB, \
+    ROUND((CAST(mflog.LogSize AS FLOAT)*8)/1024,2) LogSizeMB, \
+    ROUND((CAST((mfrows.RowSize+mflog.LogSize) AS FLOAT)*8)/1024,2) Gesamt, \
+    recovery_model_desc \
 FROM sys.databases db \
     LEFT JOIN (SELECT database_id, SUM(size) RowSize \
                  FROM sys.master_files \

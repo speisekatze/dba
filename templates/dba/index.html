@@ -72,14 +72,51 @@
     <input type="submit" name="nichtsuchen" value="Alles zeigen" style="background-image: url(../layout/ldeLayout/sumliste.png);" class="navigationButton">
     <br class="end">
    </div>
+    <div id="navigation">
+        <input class="navigationButton" type="submit" style="background-image: url(../layout/ldeLayout/menuAuswahl.png);" value="Auswahl" name="select">
+        <input class="navigationButton" type="button" style="background-image: url(../layout/ldeLayout/loeschen.png);" value="Löschen" id="startLoeschen">
+        <input class="navigationButton" type="button" style="background-image: url(../layout/ldeLayout/archive.png);" value="Archivieren" id="startArchiv">
+    </div>
+    <div class="scrollTableContainer" style="float: left; width: 100%; height: 800px;">
 {% if db_list %}
-    <ul>
-    {% for db in db_list %}
-        <li>{{ db.0 }} - {{ db.1 }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Keine Hosts konfiguriert.</p>
+    <table class="ldeTable" style="width: 100%;">
+        <thead>
+            <tr>
+                <th widht="16%">Name</th>
+                <th style="text-align: right;">Daten</th>
+                <th style="text-align: right;">Log</th>
+                <th style="text-align: right;">Gesamt</th>
+                <th>Vernichtung</th>
+                <th>Wiederherstellungsmodell</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for db in db_list %}
+            <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %}">
+                <td>{{ db.name }}</td>
+                <td style="text-align: right;">{{ db.size }}</td>
+                <td style="text-align: right;">{{ db.log }}</td>
+                {% if db.sum > 5000 %}
+                <td style="text-align: right; color: red;">{{ db.sum }}</td>
+                {% else %}
+                <td style="text-align: right; color: green;">{{ db.sum }}</td>
+                {% endif %}
+                {% if db.delta < -8999 %}
+                <td style="color: white; background-color: red;">{{ db.delete }}</td>
+                {% elif db.delta < 0 %}
+                <td style="color: red;">{{ db.delete }}</td>
+                {% else %}
+                <td style="color: green;">{{ db.delete }}</td>
+                {% endif %}
+                <td>{{ db.add }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr><td colspan="5"></td></tr>
+        </tfoot>
+    </table>
 {% endif %}
+</div>
 </form>
 {% endblock content %}
