@@ -12,6 +12,7 @@ WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'test', '
 GROUP BY table_schema;",
     'find_db_dbt': "SELECT geplante_vern_am, ziel_db FROM Datenbank WHERE vernichtet_db = 0 \
         AND ziel_db LIKE %s ORDER BY bereitgestellt_am DESC LIMIT 1;",
+    'db_dbt_all': "SELECT geplante_vern_am, ziel_db FROM Datenbank",
 }
 
 

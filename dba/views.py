@@ -4,8 +4,9 @@ from datetime import date
 # maybe later - reverse
 from django.views import generic
 from src.config import config
-from src.db import mssql, mysql, oracle
+from src.db import mssql, mysql, oracle, sqlite
 from .forms import SucheForm
+import re
 
 
 # Create your views here.
@@ -35,23 +36,29 @@ class IndexView(generic.FormView):
         context = get_default_data()
         context['form'] = SucheForm(host_list)
         context['host_list'] = host_list
-        # context['debugmessage'] = request.POST
         context['seite'] = 'Übersicht'
         context['instance_list'] = self.get_instance_list(host, instance)
         if (request.POST.get('suchen') == 'Suchen'):
+            dev = umgebungen_laden(self.conf['dba']['lde']['dev'], host, instance)
+            beta = umgebungen_laden(self.conf['dba']['lde']['beta'], host, instance)
+            release = umgebungen_laden(self.conf['dba']['lde']['release'], host, instance)
             dbt = connect_dbt(self.conf)
+            vernichten = load_dbt(dbt)
             db_tuples = self.get_db_list(host, instance)
             context['db_list'] = []
             for db in db_tuples:
                 items = {}
-                info = mysql.query(dbt, 'find_db_dbt', ('%'+db[0]+'%',))
+                info = find_in_dbt(vernichten, instance, db[0])
+                items['umgebung'] = 'DEV: ' + umgebung_suchen(dev, db[0])
+                items['umgebung'] += "\r\n" + 'BETA: ' + umgebung_suchen(beta, db[0])
+                items['umgebung'] += "\r\n" + 'RELEASE: ' + umgebung_suchen(release, db[0])
                 items['name'] = db[0]
                 items['size'] = db[1]
                 items['log'] = db[2]
                 items['sum'] = db[3]
                 items['add'] = db[4]
                 if info:
-                    items['delete'] = date.fromtimestamp(info[0][0])
+                    items['delete'] = date.fromtimestamp(info)
                     items['delta'] = (items['delete'] - date.today()).days
                 else:
                     items['delete'] = 'nicht gefunden'
@@ -66,6 +73,8 @@ class IndexView(generic.FormView):
                 for instance in item['instances']:
                     if selected is not None and selected == instance['name']:
                         instance.update({'selected': 'selected="selected"'})
+                    else:
+                        instance.update({'selected': ''})
                     instances.append(instance)
                 return instances
         return []
@@ -136,3 +145,34 @@ def connect_dbt(conf):
         'database': conf['dba']['dbt']['database']
     }
     return mysql.create(dbt_conf)
+
+
+def load_dbt(connection):
+    dbt = mysql.query(connection, 'db_dbt_all')
+    return dbt
+
+
+def find_in_dbt(dbt, instance, db_name):
+    result = None
+    pattern = None
+    if instance is None:
+        pattern = re.compile(r'\w - ' + db_name + '$')
+    else:
+        pattern = re.compile(instance + ' - ' + db_name + '$')
+    for db in dbt:
+        if pattern.search(db[1]):
+            result = db[0]
+    return result
+
+
+def umgebungen_laden(file, host, instance):
+    dev_db = sqlite.create(file)
+    dev = sqlite.query(dev_db, 'umgebungen', [host + '\\' + instance])
+    return dev
+
+
+def umgebung_suchen(umgebungen, db_name):
+    for umgebung in umgebungen:
+        if db_name == umgebung[0].decode("cp1252"):
+            return umgebung[1].decode("cp1252")
+    return ''

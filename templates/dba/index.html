@@ -83,11 +83,12 @@
         <caption>Datenbankliste</caption>
         <thead>
             <tr>
-                <th id="tblName" widht="16%">Name</th>
+                <th id="tblName" width="16%">Name</th>
+                <th id="tblUmgebung" width="16%">Umgebung</th>
+                <th id="tblDelete">Vernichtung</th>
                 <th id="tblSize" style="text-align: right;">Daten</th>
                 <th id="tblLog" style="text-align: right;">Log / Temp</th>
                 <th id="tblSum" style="text-align: right;">Gesamt</th>
-                <th id="tblDelete">Vernichtung</th>
                 <th id="tblInfo">Informationen</th>
             </tr>
         </thead>
@@ -95,19 +96,20 @@
             {% for db in db_list %}
             <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %}">
                 <td>{{ db.name }}</td>
-                <td style="text-align: right;">{{ db.size }}</td>
-                <td style="text-align: right;">{{ db.log }}</td>
-                {% if db.sum > 5000 %}
-                <td style="text-align: right; color: red;">{{ db.sum }}</td>
-                {% else %}
-                <td style="text-align: right; color: green;">{{ db.sum }}</td>
-                {% endif %}
+                <td>{{ db.umgebung|linebreaksbr }}</td>
                 {% if db.delta < -8999 %}
                 <td style="color: white; background-color: red;">{{ db.delete }}</td>
                 {% elif db.delta < 0 %}
                 <td style="color: red;">{{ db.delete }}</td>
                 {% else %}
                 <td style="color: green;">{{ db.delete }}</td>
+                {% endif %}
+                <td style="text-align: right;">{{ db.size }}</td>
+                <td style="text-align: right;">{{ db.log }}</td>
+                {% if db.sum > 5000 %}
+                <td style="text-align: right; color: red;">{{ db.sum }}</td>
+                {% else %}
+                <td style="text-align: right; color: green;">{{ db.sum }}</td>
                 {% endif %}
                 <td>{{ db.add }}</td>
             </tr>

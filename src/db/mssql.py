@@ -61,7 +61,7 @@ def find_in_table(connection, table, where, data):
     return result
 
 
-def query(connection, query_name):
+def query(connection, query_name, param=None):
     result = None
     sql = queries[query_name]
     cursor = connection.cursor()
