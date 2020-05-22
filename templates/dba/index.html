@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block script %}
 <script>
     $( document ).ready(function() {
@@ -28,11 +28,6 @@
    </h3>
    <div id="einstellungMenuListe" class="menuExpandStatic" style="padding-top:5px;">
     <div style="float:left;width:400px;">
-     <label class="left" for="suche" style="width:80px;">Suchen:</label>
-     <div id="klientListeDiv" style="float:left;">
-      <input type="text" name="suche" value="" id="such">
-     </div>
-     <br class="end">
      <label class="left" style="width:80px;">Server:</label>
         <select name="hosts" id="hosts" style="float:left;">
             <option value="">Bitte einen Server wählen</option>
@@ -56,26 +51,14 @@
         {% endif %}
      <br class="end">
     </div>
-    <div style="float:left;width:400px;">
-     <label class="left" for="suchenIn" style="margin-right:1em;margin-left:1em;width:100px;">Suchen in:</label>
-     <select name="suchenIn" id="suchenIn" style="float:left;">
-        <option value="alles">Alles (Namen/Akz/Anschrift)</option>
-     </select>
-     <br class="end">
-     <label class="left" for="fallart" style="margin-right:1em;margin-left:1em;width:100px">Zuständigkeit:</label>
-     <select name="fallart" id="fallart" style="float:left;">
-      <option title="Alle Fälle" value="alle" selected="selected">Alle Fälle</option>
-     </select>
-    </div>
-    <br class="end">
-    <input type="submit" name="suchen" value="Suchen" style="background-image: url(../layout/ldeLayout/suchen.png);margin-left:65px;" class="navigationButton">
+    <input type="submit" name="suchen" value="Suchen" style="background-image: url({% static "img/suchen.png" %});margin-left:65px;" class="navigationButton">
     <input type="submit" name="nichtsuchen" value="Alles zeigen" style="background-image: url(../layout/ldeLayout/sumliste.png);" class="navigationButton">
     <br class="end">
    </div>
     <div id="navigation">
-        <input class="navigationButton" type="submit" style="background-image: url(../layout/ldeLayout/menuAuswahl.png);" value="Auswahl" name="select">
-        <input class="navigationButton" type="button" style="background-image: url(../layout/ldeLayout/loeschen.png);" value="Löschen" id="startLoeschen">
-        <input class="navigationButton" type="button" style="background-image: url(../layout/ldeLayout/archive.png);" value="Archivieren" id="startArchiv">
+        <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Auswahl" name="select">
+        <input class="navigationButton" type="button" style="background-image: url({% static "img/loeschen.png" %});" value="Löschen" id="startLoeschen">
+        <input class="navigationButton" type="button" style="background-image: url({% static "img/archive.png" %});" value="Archivieren" id="startArchiv">
     </div>
     <div class="scrollTableContainer" style="float: left; width: 100%; height: 800px;">
 {% if db_list %}
@@ -83,8 +66,8 @@
         <caption>Datenbankliste</caption>
         <thead>
             <tr>
-                <th id="tblName" width="16%">Name</th>
-                <th id="tblUmgebung" width="16%">Umgebung</th>
+                <th id="tblName" width="200">Name</th>
+                <th id="tblUmgebung" width="550">Umgebung</th>
                 <th id="tblDelete">Vernichtung</th>
                 <th id="tblSize" style="text-align: right;">Daten</th>
                 <th id="tblLog" style="text-align: right;">Log / Temp</th>
@@ -94,7 +77,7 @@
         </thead>
         <tbody>
             {% for db in db_list %}
-            <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %}">
+            <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %}" style="border: 1px solid black">
                 <td>{{ db.name }}</td>
                 <td>{{ db.umgebung|linebreaksbr }}</td>
                 {% if db.delta < -8999 %}
