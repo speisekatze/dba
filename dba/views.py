@@ -20,6 +20,8 @@ class IndexView(generic.FormView):
     template_name = 'dba/index.html'
     conf = config('config/config.yml')
     form_class = SucheForm
+    instance_name = None
+    host_name = None
 
     def get(self, request, *args, **kwargs):
         host_list = self.get_hosts()
@@ -44,11 +46,11 @@ class IndexView(generic.FormView):
             release = umgebungen_laden(self.conf, host, instance)
             dbt = connect_dbt(self.conf)
             vernichten = load_dbt(dbt)
-            db_tuples = self.get_db_list(host, instance)
+            db_tuples = self.get_db_list(self.host_name, self.instance_name)
             context['db_list'] = []
             for db in db_tuples:
                 items = {}
-                info = find_in_dbt(vernichten, instance, db[0])
+                info = find_in_dbt(vernichten, self.instance_name, db[0])
                 items['umgebung'] = 'DEV: ' + umgebung_suchen(dev, db[0])
                 items['umgebung'] += "\r\n" + 'BETA: ' + umgebung_suchen(beta, db[0])
                 items['umgebung'] += "\r\n" + 'RELEASE: ' + umgebung_suchen(release, db[0])
@@ -73,6 +75,7 @@ class IndexView(generic.FormView):
                 for instance in item['instances']:
                     if selected is not None and selected == instance['name']:
                         instance.update({'selected': 'selected="selected"'})
+                        self.instance_name = instance['name']
                     else:
                         instance.update({'selected': ''})
                     instances.append(instance)
@@ -85,6 +88,7 @@ class IndexView(generic.FormView):
         for host in hosts:
             if selected is not None and selected == host['name']:
                 host.update({'selected': 'selected="selected"'})
+                self.host_name = host['name']
             else:
                 host.update({'selected': ''})
             content.append(host)
@@ -111,7 +115,8 @@ def prepare_config(configuration, host, instance=None):
         if item['name'] == host:
             conf['server'] = item['fqdn']
             conf['driver'] = item['driver']
-            conf['lde_conf'] = item['lde_conf']
+            if 'lde_conf' in item:
+                conf['lde_conf'] = item['lde_conf']
             conf['database'] = ''
             if instance is not None:
                 conf['instance'] = prepare_instance_config(item, instance)
