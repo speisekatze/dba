@@ -39,9 +39,9 @@ class IndexView(generic.FormView):
         context['seite'] = 'Übersicht'
         context['instance_list'] = self.get_instance_list(host, instance)
         if (request.POST.get('suchen') == 'Suchen'):
-            dev = umgebungen_laden(self.conf['dba']['lde']['dev'], host, instance)
-            beta = umgebungen_laden(self.conf['dba']['lde']['beta'], host, instance)
-            release = umgebungen_laden(self.conf['dba']['lde']['release'], host, instance)
+            dev = umgebungen_laden(self.conf, host, instance)
+            beta = umgebungen_laden(self.conf, host, instance)
+            release = umgebungen_laden(self.conf, host, instance)
             dbt = connect_dbt(self.conf)
             vernichten = load_dbt(dbt)
             db_tuples = self.get_db_list(host, instance)
@@ -111,6 +111,7 @@ def prepare_config(configuration, host, instance=None):
         if item['name'] == host:
             conf['server'] = item['fqdn']
             conf['driver'] = item['driver']
+            conf['lde_conf'] = item['lde_conf']
             conf['database'] = ''
             if instance is not None:
                 conf['instance'] = prepare_instance_config(item, instance)
@@ -165,9 +166,13 @@ def find_in_dbt(dbt, instance, db_name):
     return result
 
 
-def umgebungen_laden(file, host, instance):
-    dev_db = sqlite.create(file)
-    dev = sqlite.query(dev_db, 'umgebungen', [host + '\\' + instance])
+def umgebungen_laden(conf, host, instance):
+    dev_db = sqlite.create(conf['dba']['lde']['dev'])
+    db_conf = prepare_config(conf, host, instance)
+    if db_conf['driver'] == 'MSSQL':
+        dev = sqlite.query(dev_db, 'umgebungen', [host + '\\' + instance])
+    else:
+        dev = sqlite.query(dev_db, 'umgebungen', [db_conf['lde_conf']])
     return dev
 
 
