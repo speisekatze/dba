@@ -75,6 +75,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tools.wsgi.application'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 DBA_CONFIG_FILE = 'config/config.yml'
+PASSWD_WORD_FILE = 'config/wortliste.txt'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

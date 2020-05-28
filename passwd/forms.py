@@ -1,5 +1,3 @@
-import os
-from django.conf import settings
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from django import forms
@@ -9,6 +7,7 @@ class PasswdForm(forms.Form):
     laenge = forms.CharField(label="Länge")
     filler = forms.CharField(label="Füllzeichen")
     typ = forms.ChoiceField(label="Typ", choices=[('words', 'Wörter'), ('chars', 'Zeichen')])
+    count = forms.CharField(label='Anzahl')
 
     def __init__(self, *args, **kwargs):
         super(PasswdForm, self).__init__(*args, **kwargs)
@@ -22,12 +21,13 @@ class PasswdForm(forms.Form):
         self.helper.layout = Layout(
             Fieldset(
                 'Einstellungen',
+                'count',
                 'typ',
                 'laenge',
                 'filler',
-            ButtonHolder(
-                Submit('submit', 'Senden')
-            )
+                ButtonHolder(
+                    Submit('submit', 'Senden')
+                )
             ),
 
         )
