@@ -4,3 +4,5 @@ config/config.yml
 __pycache__
 config/secret.key
 *.db
+*.7z
+*.txt
