@@ -5,4 +5,3 @@ __pycache__
 config/secret.key
 *.db
 *.7z
-*.txt
