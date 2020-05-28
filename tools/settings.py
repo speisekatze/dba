@@ -73,6 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tools.wsgi.application'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+DBA_CONFIG_FILE = 'config/config.yml'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

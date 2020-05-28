@@ -1,11 +1,12 @@
 # maybe later - get_object_or_404
+from django.conf import settings
 from django.shortcuts import render
 from datetime import date
 # maybe later - reverse
 from django.views import generic
 from src.config import config
 from .app import general
-from .app.dblist import dblistApp
+from .app.dblist import DbListApp
 from .forms import NewDbForm
 
 
@@ -18,24 +19,25 @@ def get_default_data():
 
 class IndexView(generic.FormView):
     template_name = 'dba/index.html'
-    conf = config('config/config.yml')
+    conf = config(settings.DBA_CONFIG_FILE)
+    seite = 'Nicht Benutzt'
 
     def get(self, request, *args, **kwargs):
         context = get_default_data()
-        context['seite'] = 'Übersicht'
+        context['seite'] = self.seite
 
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         context = get_default_data()
-        context['seite'] = 'Übersicht'
+        context['seite'] = self.seite
 
         return render(request, self.template_name, context)
 
 
 class NewDBView(generic.FormView):
     template_name = 'dba/newdb.html'
-    conf = config('config/config.yml')
+    conf = config(settings.DBA_CONFIG_FILE)
     form_class = NewDbForm
 
     def get(self, request, *args, **kwargs):
@@ -47,26 +49,27 @@ class NewDBView(generic.FormView):
         return render(request, self.template_name, context)
 
 
-class dblistView(generic.FormView):
+class DbListView(generic.FormView):
     template_name = 'dba/index.html'
-    conf = config('config/config.yml')
+    conf = config(settings.DBA_CONFIG_FILE)
+    seite = 'Übersicht'
 
     def get(self, request, *args, **kwargs):
-        dblist = dblistApp(self.conf)
+        dblist = DbListApp(self.conf)
         host_list = dblist.get_hosts()
         context = get_default_data()
-        context['seite'] = 'Übersicht'
+        context['seite'] = self.seite
         context['host_list'] = host_list
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        dblist = dblistApp(self.conf)
+        dblist = DbListApp(self.conf)
         host = request.POST.get('hosts')
         instance = request.POST.get('instances')
         host_list = dblist.get_hosts(host)
         context = get_default_data()
         context['host_list'] = host_list
-        context['seite'] = 'Übersicht'
+        context['seite'] = self.seite
         context['host_name'] = dblist.host_name
         context['instance_list'] = dblist.get_instance_list(host, instance)
         context['instance_name'] = dblist.instance_name

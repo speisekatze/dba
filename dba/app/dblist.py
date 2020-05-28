@@ -2,7 +2,7 @@ from src.db import mssql, mysql, oracle
 from . import general
 
 
-class dblistApp():
+class DbListApp():
     conf = None
     instance_name = None
     host_name = None

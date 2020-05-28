@@ -1,4 +1,5 @@
 import os
+from django.conf import settings
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from django import forms
@@ -19,7 +20,7 @@ class SucheForm(forms.Form):
 
 
 class NewDbForm(forms.Form):
-    conf = config('config/config.yml')
+    conf = config(settings.DBA_CONFIG_FILE)
     db_name = forms.CharField(label='Datenbankname')
     u_name = forms.CharField(label='Umgebung')
     server = forms.ChoiceField(label='Server',
