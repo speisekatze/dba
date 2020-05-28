@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 INSTALLED_APPS = [
     'polls.apps.PollsConfig',
     'dba.apps.DbaConfig',
+    'passwd.apps.PasswdConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
