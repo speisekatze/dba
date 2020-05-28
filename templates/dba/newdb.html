@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags%}
+{% block script %}
+<script>
+    $( document ).ready(function() {
+    });
+</script>
+
+{% endblock script %}
+{% block content %}
+{% if debugmessage %}
+<fieldset>
+    <legend>Debugmessage</legend>
+    <pre>
+    {{debugmessage}}
+    </pre>
+</fieldset>
+{% endif %}
+<h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
+    <span class="headline" style="text-align:left;width:80%;">Neue Datenbank auf {{ host_name }} ({{host.driver}}) - {{ instance_name }}</span>
+</h3>
+{% crispy form form.helper %}
+
+{% endblock content %}
