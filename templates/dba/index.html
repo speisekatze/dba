@@ -52,10 +52,15 @@
      <br class="end">
     </div>
     <input type="submit" name="suchen" value="Suchen" style="background-image: url({% static "img/suchen.png" %});margin-left:65px;" class="navigationButton">
-    <input type="submit" name="nichtsuchen" value="Alles zeigen" style="background-image: url(../layout/ldeLayout/sumliste.png);" class="navigationButton">
+    <input type="submit" name="nichtsuchen" value="Alles zeigen" style="background-image: url({% static "img/sumliste.png" %});" class="navigationButton">
     <br class="end">
    </div>
     <div id="navigation">
+        <a href="newdb/{{ host_name }}/{{ instance_name }}" >
+            <span class="navigationButton" style="vertical-align: middle;padding: 1px 15px 1px 30px;display: inline-block; background-image: url({% static "img/neuanlage.png" %});">
+                <span style="height: 25px;vertical-align: middle; display:table-cell;">Neuanlage</span>
+            </span>
+        </a>
         <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Auswahl" name="select">
         <input class="navigationButton" type="button" style="background-image: url({% static "img/loeschen.png" %});" value="Löschen" id="startLoeschen">
         <input class="navigationButton" type="button" style="background-image: url({% static "img/archive.png" %});" value="Archivieren" id="startArchiv">
@@ -83,9 +88,9 @@
                 {% if db.delta < -8999 %}
                 <td style="color: white; background-color: red;">{{ db.delete }}</td>
                 {% elif db.delta < 0 %}
-                <td style="color: red;">{{ db.delete }}</td>
+                <td><a style="color: red;" target="_blank" href="http://dev.logodata.intern/dbt/index.php?request=ausgabe&id={{ db.dbtid }}">{{ db.delete }}</a></td>
                 {% else %}
-                <td style="color: green;">{{ db.delete }}</td>
+                <td><a style="color: green;" target="_blank" href="http://dev.logodata.intern/dbt/index.php?request=ausgabe&id={{ db.dbtid }}">{{ db.delete }}</a></td>
                 {% endif %}
                 <td style="text-align: right;">{{ db.size }}</td>
                 <td style="text-align: right;">{{ db.log }}</td>
