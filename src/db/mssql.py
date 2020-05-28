@@ -16,7 +16,7 @@ FROM sys.databases db \
                  FROM sys.master_files \
                 WHERE type = 1 \
                 GROUP BY database_id, type) mflog ON mflog.database_id = db.database_id \
-    WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb');"
+    WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb') ORDER BY DB_NAME(db.database_id);"
 }
 
 

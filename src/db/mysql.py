@@ -9,10 +9,11 @@ queries = {
         ENGINE AS info \
 FROM information_schema.tables \
 WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'test', 'mysql') \
-GROUP BY table_schema;",
+GROUP BY table_schema ORDER BY table_schema;",
     'find_db_dbt': "SELECT geplante_vern_am, ziel_db FROM Datenbank WHERE vernichtet_db = 0 \
         AND ziel_db LIKE %s ORDER BY bereitgestellt_am DESC LIMIT 1;",
-    'db_dbt_all': "SELECT geplante_vern_am, ziel_db FROM Datenbank",
+    'db_dbt_all': "SELECT geplante_vern_am, ziel_db, datenbank_id FROM Datenbank",
+    'get_kunden': "SELECT * FROM Kunde",
 }
 
 
