@@ -11,6 +11,43 @@ def get_default_data():
     return data
 
 
+def words(laenge, anzahl, filler):
+    passwds = ''
+    if laenge < 2:
+        laenge = abs(laenge) + 2
+    for _ in range(0, anzahl):
+        pw = []
+        for _ in range(0, laenge):
+            with open(settings.PASSWD_WORD_FILE) as f:
+                lines = f.readlines()
+                pw.append(random.choice(lines).rstrip("\n").rstrip("\r"))
+        passwds += filler[0].join(pw) + "\r\n"
+    return passwds
+
+
+def chars(laenge, anzahl):
+    passwds = ''
+    up = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    low = up.lower()
+    digi = '0123456789'
+    special = '$§%&()=?+*-_#'
+    if laenge < 12:
+        laenge = abs(laenge) + 12
+    for _ in range(0, anzahl):
+        pw = []
+        for i in range(0, laenge):
+            if i == 0:
+                pw.append(random.choice(up))
+            elif i < (laenge/2):
+                pw.append(random.choice(up+low+digi))
+            elif i > (laenge/2):
+                pw.append(random.choice(special+low+digi))
+            else:
+                pw.append(random.choice(special))
+        passwds += ''.join(pw) + "\r\n"
+    return passwds
+
+
 # Create your views here.
 class PasswdView(FormView):
     template_name = 'passwd/index.html'
@@ -36,36 +73,10 @@ class PasswdView(FormView):
         laenge = int(request.POST.get('laenge'))
         typ = request.POST.get('typ')
         filler = request.POST.get('filler')
-        context['passwds'] = ''
         if typ == 'words':
-            if laenge < 2:
-                laenge = abs(laenge) + 2
-            for k in range(0, anzahl):
-                pw = []
-                for i in range(0, laenge):
-                    with open(settings.PASSWD_WORD_FILE) as f:
-                        lines = f.readlines()
-                        pw.append(random.choice(lines).rstrip("\n").rstrip("\r"))
-                context['passwds'] += filler[0].join(pw) + "\r\n"
+            context['passwds'] = words(laenge, anzahl, filler)
         else:
-            up = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-            low = up.lower()
-            digi = '0123456789'
-            special = '$§%&()=?+*-_#'
-            if laenge < 12:
-                laenge = abs(laenge) + 12
-            for k in range(0, anzahl):
-                pw = []
-                for i in range(0, laenge):
-                    if i == 0:
-                        pw.append(random.choice(up))
-                    elif i < (laenge/2):
-                        pw.append(random.choice(up+low+digi))
-                    elif i > (laenge/2):
-                        pw.append(random.choice(special+low+digi))
-                    else:
-                        pw.append(random.choice(special))
-                context['passwds'] += ''.join(pw) + "\r\n"
+            context['passwds'] = chars(laenge, anzahl)
         return render(request, self.template_name, context)
 
     def get_initial(self):
