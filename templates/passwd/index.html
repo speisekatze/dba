@@ -22,11 +22,15 @@
     </pre>
 </fieldset>
 {% endif %}
-<h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
-    <span class="headline" style="text-align:left;width:80%;">Voreinstellungen</span>
-   </h3>
+    <div style="border: 1px solid #cdd;">
+    <h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
+        <span class="headline" style="text-align:left;width:80%;">Einstellungen</span>
+    </h3>
    {% crispy form form.helper %}
-   <div class="">
+   <br class="end" />
+    </div>
+    <br class="end" />
+    <div class="">
        <textarea>{{ passwds }}</textarea>
-   </div>
+    </div>
 {% endblock content %}

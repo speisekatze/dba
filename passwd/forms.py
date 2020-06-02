@@ -1,5 +1,5 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, HTML
 from django import forms
 
 
@@ -18,9 +18,8 @@ class PasswdForm(forms.Form):
         self.helper.label_class = 'left'
         self.helper.field_class = 'left'
         self.helper.field_template = 'field.html'
+
         self.helper.layout = Layout(
-            Fieldset(
-                'Einstellungen',
                 'count',
                 'typ',
                 'laenge',
@@ -28,6 +27,4 @@ class PasswdForm(forms.Form):
                 ButtonHolder(
                     Submit('submit', 'Senden')
                 )
-            ),
-
         )
