@@ -310,13 +310,40 @@ h3.menuHeadStatic {
 	background-color: #eef3f7
 }
 
-h3.menuHeadStatic>span {
+h1.menuHeadStatic {
+	height: auto;
+	line-height: 32px;
+	border: 1px solid #cdd;
+	margin: 5px 5px 5px 0;
+	padding: 0 3px;
+	background-color: #eef3f7;
+	font-weight: normal;
+	font-size: medium;
+}
+
+.navigationActive {
+	padding-left: 2px;
+	border: 1px solid #cdd;
+	background-color: #234283;
+	color: #cdd;
+	text-align:center;
+	width:25%;
+	display: inline-block;
+}
+
+.navigation {
+	padding-left: 2px;
+	text-align:center;
+	width:25%;
+	display: inline-block;
+}
+
+.headline {
 	padding-left: 18px;
 	display: inline-block;
 	color: #1f327f;
 	font-size: .9em
 }
-
 .menuExpandStatic {
 	border: 1px solid #cdd;
 	padding-left: 10px;
@@ -484,8 +511,12 @@ h3.menuHeadStatic>span {
 		padding: 0;
 		margin-top: -5px
 	}
+
 	#currentStateMenu .menuHeadStatic span.headline {
-		padding-left: 2px
+		padding-left: 2px;
+		display: inline-block;
+		color: #1f327f;
+		font-size: .9em
 	}
 	#currentStateMenu .menuExpandStatic {
 		margin-top: 8%

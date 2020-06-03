@@ -1,13 +1,42 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block script %}
+<script>
+    $( document ).ready(function() {
+        $('#hosts').bind("change", { 
+            msg:"hostchange" 
+        },function(event) { 
+            $('#sucheForm').submit();
+        });
+    });
+</script>
 
+{% endblock script %}
 {% block content %}
-{% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
-        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
+{% if debugmessage %}
+<fieldset>
+    <legend>Debugmessage</legend>
+    <pre>
+    {{debugmessage}}
+    </pre>
+</fieldset>
 {% endif %}
+<div>
+    <h1 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
+        <a href="../polls/" target=_self><span class="navigationActive">Umfragen</span></a>
+        <a href="../dba/" target=_self><span class="navigation">Datenbanktools</span></a>
+        <a href="../passwd/" target=_self><span class="navigation">Passwörter</span></a>
+    </h1>
+</div>
+    <div class="scrollTableContainer" style="float: left; width: 100%; height:auto;">
+        {% if latest_question_list %}
+        <ul>
+        {% for question in latest_question_list %}
+            <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+</div>
 {% endblock content %}
