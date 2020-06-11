@@ -16,7 +16,9 @@ FROM sys.databases db \
                  FROM sys.master_files \
                 WHERE type = 1 \
                 GROUP BY database_id, type) mflog ON mflog.database_id = db.database_id \
-    WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb') ORDER BY DB_NAME(db.database_id);"
+    WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb') ORDER BY DB_NAME(db.database_id);",
+    'simple': 'ALTER DATABASE {0} SET RECOVERY SIMPLE;',
+    'shrink': "DBCC SHRINKDATABASE (?, NOTRUNCATE);"
 }
 
 
@@ -33,13 +35,14 @@ def create(config):
     connection = None
     try:
         connection_string = build_connection_string(config)
-        connection = pyodbc.connect(connection_string)
+        connection = pyodbc.connect(connection_string, autocommit=True)
     except Exception as ex:
         print(ex)
     return connection
 
 
 def load_table(connection, table, where='', fields='*'):
+    print('load')
     query = None
     result = None
     sql = 'SELECT '+fields+' FROM ' + table
@@ -50,14 +53,17 @@ def load_table(connection, table, where='', fields='*'):
     if query:
         result = query.fetchall()
     load_cursor.close()
+    connection.commit()
     return result
 
 
 def find_in_table(connection, table, where, data):
+    print('find')
     sql = 'SELECT * FROM '+table+' WHERE '+where
     find_cursor = connection.cursor()
     result = find_cursor.execute(sql, data).fetchall()
     find_cursor.close()
+    connection.commit()
     return result
 
 
@@ -65,8 +71,24 @@ def query(connection, query_name, param=None):
     result = None
     sql = queries[query_name]
     cursor = connection.cursor()
-    query = cursor.execute(sql)
+    if param is not None:
+        query = cursor.execute(sql, param)
+    else:
+        query = cursor.execute(sql)
     if query:
         result = query.fetchall()
     cursor.close()
+    connection.commit()
+    return result
+
+
+def query_format(connection, query_name, param):
+    result = None
+    sql = queries[query_name]
+    cursor = connection.cursor()
+    s = sql.format(param)
+    print(s)
+    cursor.execute(s)
+    cursor.close()
+    connection.commit()
     return result

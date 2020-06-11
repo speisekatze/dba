@@ -69,38 +69,55 @@ class DbListView(generic.FormView):
         host_list = dblist.get_hosts(host)
         context = get_default_data()
         context['host_list'] = host_list
-        context['seite'] = self.seite
         context['host_name'] = dblist.host_name
         context['instance_list'] = dblist.get_instance_list(host, instance)
         context['instance_name'] = dblist.instance_name
-        if (request.POST.get('suchen') == 'Suchen'):
-            dev = general.umgebungen_laden(self.conf, 'dev', dblist.host_name,
-                                           dblist.instance_name)
-            beta = general.umgebungen_laden(self.conf, 'beta', dblist.host_name,
-                                            dblist.instance_name)
-            release = general.umgebungen_laden(self.conf, 'release', dblist.host_name,
-                                               dblist.instance_name)
-            dbt = general.connect_dbt(self.conf)
-            vernichten = general.load_dbt(dbt)
-            db_tuples = dblist.get_db_list()
-            context['db_list'] = []
-            for db in db_tuples:
-                items = {}
-                info = general.find_in_dbt(vernichten, dblist.instance_name, db[0])
-                items['umgebung'] = 'DEV: ' + general.umgebung_suchen(dev, db[0])
-                items['umgebung'] += "\r\n" + 'BETA: ' + general.umgebung_suchen(beta, db[0])
-                items['umgebung'] += "\r\n" + 'RELEASE: ' + general.umgebung_suchen(release, db[0])
-                items['name'] = db[0]
-                items['size'] = db[1]
-                items['log'] = db[2]
-                items['sum'] = db[3]
-                items['add'] = db[4]
-                if info:
-                    items['delete'] = date.fromtimestamp(info[0])
-                    items['dbtid'] = info[2]
-                    items['delta'] = (items['delete'] - date.today()).days
-                else:
-                    items['delete'] = 'nicht gefunden'
-                    items['delta'] = -9000
-                context['db_list'].append(items)
+        show_list = False
+        if (request.POST.get('shrink')):
+            connection = dblist.get_db_connection()
+            dblist.db.query(connection, 'shrink', [request.POST.get('db_name')])
+            show_list = True
+        if (request.POST.get('simple')):
+            connection = dblist.get_db_connection()
+
+            dblist.db.query_format(connection, 'simple', request.POST.get('db_name'))
+            show_list = True
+        if (request.POST.get('select') == 'Auswahl'):
+            context['debugmessage'] = ''
+        if (request.POST.get('suchen') == 'Suchen' or show_list):
+            context['seite'] = self.seite
+            context['db_list'] = self.suchen(dblist)
+            context['db_driver'] = dblist.driver
         return render(request, self.template_name, context)
+
+    def suchen(self, dblist):
+        dev = general.umgebungen_laden(self.conf, 'dev', dblist.host_name,
+                                       dblist.instance_name)
+        beta = general.umgebungen_laden(self.conf, 'beta', dblist.host_name,
+                                        dblist.instance_name)
+        release = general.umgebungen_laden(self.conf, 'release', dblist.host_name, 
+                                           dblist.instance_name)
+        dbt = general.connect_dbt(self.conf)
+        vernichten = general.load_dbt(dbt)
+        db_tuples = dblist.get_db_list()
+        db_list = []
+        for db in db_tuples:
+            items = {}
+            info = general.find_in_dbt(vernichten, dblist.instance_name, db[0])
+            items['umgebung'] = 'DEV: ' + general.umgebung_suchen(dev, db[0])
+            items['umgebung'] += "\r\n" + 'BETA: ' + general.umgebung_suchen(beta, db[0])
+            items['umgebung'] += "\r\n" + 'RELEASE: ' + general.umgebung_suchen(release, db[0])
+            items['name'] = db[0]
+            items['size'] = db[1]
+            items['log'] = db[2]
+            items['sum'] = db[3]
+            items['add'] = db[4]
+            if info:
+                items['delete'] = date.fromtimestamp(info[0])
+                items['dbtid'] = info[2]
+                items['delta'] = (items['delete'] - date.today()).days
+            else:
+                items['delete'] = 'nicht gefunden'
+                items['delta'] = -9000
+            db_list.append(items)
+        return db_list

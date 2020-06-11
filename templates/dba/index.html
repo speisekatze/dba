@@ -3,6 +3,13 @@
 {% block script %}
 <script>
     $( document ).ready(function() {
+        $('.clickable').bind('click', {
+            msg: 'select'
+        }, function(event) {
+            $(event.target).parent('tr').children().children('input').prop('checked', true);
+            $('.clickable').removeClass('selected');
+            $(event.target).parent('tr').addClass('selected');
+        });
         $('#hosts').bind("change", { 
             msg:"hostchange" 
         },function(event) { 
@@ -70,11 +77,14 @@
         </a>
         <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Auswahl" name="select">
         <input class="navigationButton" type="button" style="background-image: url({% static "img/loeschen.png" %});" value="Löschen" id="startLoeschen">
-        <input class="navigationButton" type="button" style="background-image: url({% static "img/archive.png" %});" value="Archivieren" id="startArchiv">
+        {% if db_driver == 'MSSQL' %}
+            <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Verkleinern" name="shrink">
+            <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Wiederherstellungsmodell" name="simple">
+        {% endif %}
     </div>
     <div class="scrollTableContainer" style="float: left; width: 100%; height:auto;">
 {% if db_list %}
-    <table class="ldeTable" style="width: 100%;">
+    <table id="db_table" class="ldeTable" style="width: 100%;">
         <caption>Datenbankliste</caption>
         <thead>
             <tr>
@@ -89,8 +99,8 @@
         </thead>
         <tbody>
             {% for db in db_list %}
-            <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %}" style="border: 1px solid black">
-                <td>{{ db.name }}</td>
+            <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %} clickable" style="border: 1px solid black">
+                <td><input type="radio" name="db_name" style="display: none;" value="{{ db.name }}" />{{ db.name }}</td>
                 <td>{{ db.umgebung|linebreaksbr }}</td>
                 {% if db.delta < -8999 %}
                 <td style="color: white; background-color: red;">{{ db.delete }}</td>
