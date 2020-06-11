@@ -6,6 +6,8 @@ class DbListApp():
     conf = None
     instance_name = None
     host_name = None
+    driver = None
+    db = None
 
     def __init__(self, config):
         self.conf = config
@@ -36,16 +38,21 @@ class DbListApp():
             content.append(host)
         return content
 
+    def get_db_config(self):
+        return general.prepare_config(self.conf, self.host_name, self.instance_name)
+
+    def get_db_connection(self):
+        config = self.get_db_config()
+        self.driver = config['driver']
+        if self.driver == 'MSSQL':
+            self.db = mssql
+        elif self.driver == 'MySQL':
+            self.db = mysql
+        elif self.driver == 'Oracle':
+            self.db = oracle
+        return self.db.create(config)
+
     def get_db_list(self):
-        config = general.prepare_config(self.conf, self.host_name, self.instance_name)
-        if config['driver'] == 'MSSQL':
-            db = mssql
-        elif config['driver'] == 'MySQL':
-            db = mysql
-        elif config['driver'] == 'Oracle':
-            db = oracle
-        else:
-            db = None
-        connection = db.create(config)
-        itemlist = db.query(connection, 'db_list_size', {})
+        connection = self.get_db_connection()
+        itemlist = self.db.query(connection, 'db_list_size')
         return itemlist
