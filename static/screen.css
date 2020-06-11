@@ -227,7 +227,14 @@ tr.ldeTableRow {
 tr.ldeTableRowAlternative {
 	background-color: #daf3f7
 }
-
+tr.ldeTableRow.selected {
+	background-color: #234283;
+	color: #eef3f7;
+}
+tr.ldeTableRowAlternative.selected {
+	background-color: #234283;
+	color: #daf3f7;
+}
 th {
 	background-color: #1e327f;
 	color: #e4eef7;
