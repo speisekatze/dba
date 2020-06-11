@@ -5,3 +5,4 @@ __pycache__
 config/secret.key
 *.db
 *.7z
+static/screen_alt.css
