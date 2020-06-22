@@ -3,5 +3,10 @@
 		{
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"python.linting.flake8Args": [
+			"--max-line-length=99"
+		]
+	}
 }

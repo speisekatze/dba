@@ -74,6 +74,7 @@ class DbListView(generic.FormView):
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
+            print('user error')
             settings.LOGIN_REDIRECT_URL = '/dba'
             return redirect('login')
         dblist = DbListApp(self.conf)
