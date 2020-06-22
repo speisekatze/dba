@@ -338,7 +338,25 @@ h1.menuHeadStatic {
 	display: inline-block;
 }
 
-.navigation {
+fieldset.form-group {
+	width:400px;
+	height: 200px;
+	background-color:transparent;
+	padding:8px;
+	background-color: rgba(96,126,181,0.3);
+	border-top:5px solid #607eb5;
+	border-left:5px solid #f6a200;
+	border-bottom:5px solid #05adc6;
+	border-right:5px solid #7ca505;
+	border-radius:7px;
+	box-shadow: 10px 10px 10px grey;
+	position: absolute;
+	top: calc(50vh - 100px);
+	left: calc(50vw - 200px);
+	text-align: center;
+}
+
+h1.menuHeadStatic span, .navigation {
 	padding-left: 2px;
 	text-align:center;
 	width:25%;
