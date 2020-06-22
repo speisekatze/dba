@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import ldap
+from django_auth_ldap.config import LDAPSearch, ActiveDirectoryGroupType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +28,7 @@ with open('config/secret.key') as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'lde70.logodata.intern', '192.168.1.20']
 
 
 # Application definition
@@ -120,6 +122,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -129,3 +134,70 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+# Baseline configuration.
+AUTH_USER_MODEL = 'dba.user'
+AUTH_LDAP_SERVER_URI = "ldap://abra.logodata.intern"
+LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = 'logodata.intern'
+AUTH_LDAP_BIND_DN = "CN=django agent,CN=Users,DC=logodata,DC=intern"
+AUTH_LDAP_BIND_PASSWORD = "Log0data2020"
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    "ou=LDE Benutzer,dc=logodata,dc=intern", ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)"
+)
+# Or:
+# AUTH_LDAP_USER_DN_TEMPLATE = 'uid=%(user)s,ou=users,dc=example,dc=com'
+
+# Set up the basic group parameters.
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    "ou=Gruppen,dc=logodata,dc=intern",
+    ldap.SCOPE_SUBTREE,
+    "(objectClass=groupOfNames)",
+)
+AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType(name_attr="cn")
+
+# Simple group restrictions
+AUTH_LDAP_REQUIRE_GROUP = "cn=AU,ou=Gruppen,dc=logodata,dc=intern"
+AUTH_LDAP_DENY_GROUP = "cn=Praktikanten,ou=Gruppen,dc=logodata,dc=intern"
+
+# Populate the Django user from the LDAP directory.
+AUTH_LDAP_USER_ATTR_MAP = {
+    "username": "sAMAccountName",
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+
+
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_active": "cn=AU,ou=Gruppen,dc=logodata,dc=intern",
+    "is_staff": "cn=IT,ou=Gruppen,dc=logodata,dc=intern",
+    "is_superuser": "cn=IT,ou=Gruppen,dc=logodata,dc=intern",
+    "is_dsb": "CN=Datenschützer,OU=Gruppen,DC=logodata,DC=intern",
+    "is_gf": "CN=Geschäftsführung,OU=Gruppen,DC=logodata,DC=intern",
+}
+
+# This is the default, but I like to be explicit.
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+
+# Use LDAP group membership to calculate group permissions.
+AUTH_LDAP_FIND_GROUP_PERMS = True
+
+# Cache distinguished names and group memberships for an hour to minimize
+# LDAP traffic.
+AUTH_LDAP_CACHE_TIMEOUT = 1
+
+# Keep ModelBackend around for per-user permissions and maybe a local
+# superuser.
+AUTHENTICATION_BACKENDS = (
+    "django_auth_ldap.backend.LDAPBackend",
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+}
+
+# AUTH_LDAP_START_TLS = True
