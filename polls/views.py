@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from .models import Question, Choice
 from django.urls import reverse
@@ -9,12 +10,21 @@ from django.views import generic
 def get_default_data():
     data = {}
     data['headline'] = 'Umfragen'
+    data['pass_css_class'] = 'navigation'
+    data['polls_css_class'] = 'navigationActive'
+    data['dba_css_class'] = 'navigation'
     return data
 
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
     context_object_name = 'latest_question_list'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_active:
+            settings.LOGIN_REDIRECT_URL = '/polls'
+            return redirect('login')
+        return super().get(self, request, *args, **kwargs)
 
     def get_queryset(self):
         """Return the last five published questions."""
