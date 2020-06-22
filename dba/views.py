@@ -1,6 +1,6 @@
 # maybe later - get_object_or_404
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from datetime import date
 # maybe later - reverse
 from django.views import generic
@@ -14,6 +14,9 @@ from .forms import NewDbForm
 def get_default_data():
     data = {}
     data['headline'] = 'Datenbank Admin'
+    data['pass_css_class'] = 'navigation'
+    data['polls_css_class'] = 'navigation'
+    data['dba_css_class'] = 'navigationActive'
     return data
 
 
@@ -55,6 +58,12 @@ class DbListView(generic.FormView):
     seite = 'Übersicht'
 
     def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            settings.LOGIN_REDIRECT_URL = '/dba'
+            return redirect('login')
+        print(request.user.is_dsb)
+        if not request.user.is_dsb and not request.user.is_superuser:
+            return redirect('passwd:index')
         dblist = DbListApp(self.conf)
         host_list = dblist.get_hosts()
         context = get_default_data()
@@ -63,6 +72,9 @@ class DbListView(generic.FormView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            settings.LOGIN_REDIRECT_URL = '/dba'
+            return redirect('login')
         dblist = DbListApp(self.conf)
         host = request.POST.get('hosts')
         instance = request.POST.get('instances')
@@ -73,9 +85,14 @@ class DbListView(generic.FormView):
         context['instance_list'] = dblist.get_instance_list(host, instance)
         context['instance_name'] = dblist.instance_name
         show_list = False
+        if (request.POST.get('drop')):
+            print('delete ' + request.POST.get('db_name'))
+            connection = dblist.get_db_connection()
+            dblist.db.drop(connection, request.POST.get('db_name'))
+            show_list = True
         if (request.POST.get('shrink')):
             connection = dblist.get_db_connection()
-            dblist.db.query(connection, 'shrink', [request.POST.get('db_name')])
+            dblist.db.query(connection, 'shrink', request.POST.get('db_name'))
             show_list = True
         if (request.POST.get('simple')):
             connection = dblist.get_db_connection()
@@ -95,7 +112,7 @@ class DbListView(generic.FormView):
                                        dblist.instance_name)
         beta = general.umgebungen_laden(self.conf, 'beta', dblist.host_name,
                                         dblist.instance_name)
-        release = general.umgebungen_laden(self.conf, 'release', dblist.host_name, 
+        release = general.umgebungen_laden(self.conf, 'release', dblist.host_name,
                                            dblist.instance_name)
         dbt = general.connect_dbt(self.conf)
         vernichten = general.load_dbt(dbt)

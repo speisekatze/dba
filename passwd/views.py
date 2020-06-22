@@ -8,6 +8,9 @@ from .forms import PasswdForm
 def get_default_data():
     data = {}
     data['headline'] = 'Passwort Generator'
+    data['pass_css_class'] = 'navigationActive'
+    data['polls_css_class'] = 'navigation'
+    data['dba_css_class'] = 'navigation'
     return data
 
 
