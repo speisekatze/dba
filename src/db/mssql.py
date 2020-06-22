@@ -87,8 +87,27 @@ def query_format(connection, query_name, param):
     sql = queries[query_name]
     cursor = connection.cursor()
     s = sql.format(param)
-    print(s)
     cursor.execute(s)
     cursor.close()
     connection.commit()
     return result
+
+
+def drop(connection, db_name):
+    sql_history = "EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'{0}'"
+    sql_alter = "ALTER DATABASE {0} SET  SINGLE_USER WITH ROLLBACK IMMEDIATE"
+    sql_drop = "DROP DATABASE {0}"
+    cursor = connection.cursor()
+
+    s = sql_history.format(db_name)
+    cursor.execute(s)
+
+    s = sql_alter.format(db_name)
+    cursor.execute(s)
+
+    s = sql_drop.format(db_name)
+    cursor.execute(s)
+
+    cursor.close()
+    connection.commit()
+    return None

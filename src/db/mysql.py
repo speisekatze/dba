@@ -38,3 +38,15 @@ def query(connection, query_name, param=None):
         result = cursor.fetchall()
     cursor.close()
     return result
+
+
+def drop(connection, db_name):
+    sql_drop = "DROP DATABASE {0}"
+    cursor = connection.cursor()
+
+    s = sql_drop.format(db_name)
+    cursor.execute(s)
+
+    cursor.close()
+    connection.commit()
+    return None

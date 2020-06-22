@@ -49,3 +49,15 @@ def query(connection, query_name, param=None):
         result = cursor.fetchall()
     cursor.close()
     return result
+
+
+def drop(connection, db_name):
+    sql_schema = 'DROP USER {1} CASCADE;'
+    cursor = connection.cursor()
+
+    s = sql_schema.format(db_name)
+    cursor.execute(s)
+
+    cursor.close()
+    connection.commit()
+    return None
