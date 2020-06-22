@@ -7,3 +7,4 @@ config/secret.key
 *.7z
 static/screen_alt.css
 *.pyc
+polls/__pycache__/
