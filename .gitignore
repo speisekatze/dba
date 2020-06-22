@@ -8,3 +8,4 @@ config/secret.key
 static/screen_alt.css
 *.pyc
 polls/__pycache__/
+*-38.pyc
