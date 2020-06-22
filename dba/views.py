@@ -62,7 +62,8 @@ class DbListView(generic.FormView):
             settings.LOGIN_REDIRECT_URL = '/dba'
             return redirect('login')
         print(request.user.is_dsb)
-        if not request.user.is_dsb and not request.user.is_superuser:
+        if not request.user.is_dsb and not request.user.is_superuser and not request.user.is_gf:
+            print('user error')
             return redirect('passwd:index')
         dblist = DbListApp(self.conf)
         host_list = dblist.get_hosts()
