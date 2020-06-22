@@ -1,0 +1,51 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ headline }} - {{ seite }} - TOOLS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DBA Tools" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Speisekatze" />
+    {% block meta %}{% endblock meta %}
+    <link rel="shortcut icon" href="" />
+    <link rel="home" href="" />
+    <link rel="stylesheet" type="text/css" media="screen, projection" href="{% static "screen.css" %}" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
+    {% block link %}{% endblock link %}
+<script>
+    $( document ).ready(function() {
+
+    });
+</script>
+
+
+  </head>
+  <body>
+    <div class="main" id="main">
+        {% if debugmessage %}
+        <fieldset>
+            <legend>Debugmessage</legend>
+            <pre>
+            {{debugmessage}}
+            </pre>
+        </fieldset>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <span class="border-bottom mb-4">Log In</span>
+                {{ form|crispy }}
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">Login</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <footer id="django" role="contentinfo" style="position: absolute; bottom: 10px;">
+        <p>Powered by <a href="http://www.djangoproject.com">Django</a>.</p>
+      </footer>
+  </body>
+</html>

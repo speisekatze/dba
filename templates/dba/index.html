@@ -15,6 +15,11 @@
         },function(event) { 
             $('#sucheForm').submit();
         });
+        $('#instances').bind("change", { 
+            msg:"hostchange" 
+        },function(event) { 
+            $('#suchen').click();
+        });
     });
 </script>
 
@@ -28,13 +33,6 @@
     </pre>
 </fieldset>
 {% endif %}
-<div>
-    <h1 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
-        <a href="../polls/" target=_self><span class="navigation">Umfragen</span></a>
-        <a href="../dba/" target=_self><span class="navigationActive">Datenbanktools</span></a>
-        <a href="../passwd/" target=_self><span class="navigation">Passwörter</span></a>
-    </h1>
-</div>
 <form id="sucheForm" action="/" method="post">
 {% csrf_token %}
 <h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
@@ -65,7 +63,7 @@
         {% endif %}
      <br class="end">
     </div>
-    <input type="submit" name="suchen" value="Suchen" style="background-image: url({% static "img/suchen.png" %});margin-left:65px;" class="navigationButton">
+    <input type="submit" id="suchen" name="suchen" value="Suchen" style="background-image: url({% static "img/suchen.png" %});margin-left:65px;" class="navigationButton">
     <input type="submit" name="nichtsuchen" value="Alles zeigen" style="background-image: url({% static "img/sumliste.png" %});" class="navigationButton">
     <br class="end">
    </div>
@@ -76,7 +74,7 @@
             </span>
         </a>
         <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Auswahl" name="select">
-        <input class="navigationButton" type="button" style="background-image: url({% static "img/loeschen.png" %});" value="Löschen" id="startLoeschen">
+        <input class="navigationButton" type="submit" style="background-image: url({% static "img/loeschen.png" %});" value="Löschen" name="drop">
         {% if db_driver == 'MSSQL' %}
             <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Verkleinern" name="shrink">
             <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Wiederherstellungsmodell" name="simple">

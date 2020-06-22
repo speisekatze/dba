@@ -34,8 +34,22 @@
                         </a>
                     </div>
                     <br class="end"><br>
+                    <div class="currentStateMenuButton">
+                      <a href="{% url 'logout' %}" title="Zurück">
+                        <img src="{% static "img/cancel_menu.png" %}" alt=""><br>
+                        Logout
+                      </a>
+                  </div>
+                  <br class="end"><br>
                 </div>
                 <div style="display: block; width:88%; min-width:800px; float:left;">
+                  <div>
+                    <h1 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
+                        <a href="../polls/" target=_self><span class="{{polls_css_class}}">Umfragen</span></a>
+                        <a href="../dba/" target=_self><span class="{{dba_css_class}}">Datenbanktools</span></a>
+                        <a href="../" target=_self><span class="{{pass_css_class}}">Passwörter</span></a>
+                    </h1>
+                </div>
                         {% block content %}
                         <p>Placeholder text in base template. Replace with page content.</p>
                         {% endblock content %}

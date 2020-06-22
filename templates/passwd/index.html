@@ -4,11 +4,6 @@
 {% block script %}
 <script>
     $( document ).ready(function() {
-        $('#hosts').bind("change", { 
-            msg:"hostchange" 
-        },function(event) { 
-            $('#sucheForm').submit();
-        });
     });
 </script>
 
@@ -22,13 +17,6 @@
     </pre>
 </fieldset>
 {% endif %}
-    <div>
-        <h1 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
-            <a href="../polls/" target=_self><span class="navigation">Umfragen</span></a>
-            <a href="../dba/" target=_self><span class="navigation">Datenbanktools</span></a>
-            <a href="../passwd/" target=_self><span class="navigationActive">Passwörter</span></a>
-        </h1>
-    </div>
     <div style="border: 1px solid #cdd;">
     <h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
         <span class="headline" style="text-align:left;width:80%;">Einstellungen</span>
