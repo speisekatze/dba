@@ -86,7 +86,9 @@ class DbListView(generic.FormView):
         context['host_name'] = dblist.host_name
         context['instance_list'] = dblist.get_instance_list(host, instance)
         context['instance_name'] = dblist.instance_name
-        show_list = False
+        if dblist.host_name is None:
+            return render(request, self.template_name, context)
+        show_list = True
         if (request.POST.get('drop')):
             print('delete ' + request.POST.get('db_name'))
             connection = dblist.get_db_connection()

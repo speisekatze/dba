@@ -1,7 +1,7 @@
 import cx_Oracle
 
 queries = {
-    'db_list_size': "SELECT DISTINCT owner || '/' || a.tablespace_name, \
+    'db_list_size': "SELECT DISTINCT owner, \
                                      ROUND(a.bytes/1024/1024,2) AS sze, \
                                      ROUND(c.bytes/1024/1024,2) AS tmp_size, \
                                      ROUND((a.bytes+c.bytes)/1024/1024,2) AS tmp_size, \
@@ -44,9 +44,12 @@ def query(connection, query_name, param=None):
     result = None
     sql = queries[query_name]
     cursor = connection.cursor()
-    cursor.execute(sql, param)
-    if cursor:
-        result = cursor.fetchall()
+    if param is not None:
+        query = cursor.execute(sql, param)
+    else:
+        query = cursor.execute(sql)
+    if query:
+        result = query.fetchall()
     cursor.close()
     return result
 

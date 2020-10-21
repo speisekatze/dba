@@ -7,3 +7,8 @@ config/secret.key
 *.7z
 static/screen_alt.css
 *.pyc
+lib/
+*.exe
+*.bat
+Scripts/activate
+Scripts/Activate.ps1

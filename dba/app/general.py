@@ -67,10 +67,15 @@ def umgebungen_laden(conf, lde_db, host, instance):
     dev_db = sqlite.create(conf['dba']['lde'][lde_db])
     db_conf = prepare_config(conf, host, instance)
     if db_conf['driver'] == 'MSSQL':
-        dev = sqlite.query(dev_db, 'umgebungen', [host + '\\' + instance])
+        cond = ''
+        if instance is None:
+            cond = 'none'
+        else:
+            cond = host + '\\' + instance
+        db = sqlite.query(dev_db, 'umgebungen', [cond])
     else:
-        dev = sqlite.query(dev_db, 'umgebungen', [db_conf['lde_conf']])
-    return dev
+        db = sqlite.query(dev_db, 'umgebungen', [db_conf['lde_conf']])
+    return db
 
 
 def umgebung_suchen(umgebungen, db_name):

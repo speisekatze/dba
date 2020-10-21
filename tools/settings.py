@@ -28,7 +28,7 @@ with open('config/secret.key') as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'lde70.logodata.intern', '192.168.1.20']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'lapras.logodata.intern', '192.168.1.221']
 
 
 # Application definition

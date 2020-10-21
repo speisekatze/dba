@@ -43,6 +43,8 @@ class DbListApp():
 
     def get_db_connection(self):
         config = self.get_db_config()
+        if config['driver'] is None:
+            return None
         self.driver = config['driver']
         if self.driver == 'MSSQL':
             self.db = mssql
@@ -54,5 +56,7 @@ class DbListApp():
 
     def get_db_list(self):
         connection = self.get_db_connection()
+        if connection is None:
+            return []
         itemlist = self.db.query(connection, 'db_list_size')
         return itemlist
