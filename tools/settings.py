@@ -165,6 +165,7 @@ AUTH_LDAP_USER_ATTR_MAP = {
     "first_name": "givenName",
     "last_name": "sn",
     "email": "mail",
+    "objid": "objectguid",
 }
 
 
