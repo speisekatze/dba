@@ -50,3 +50,27 @@ def drop(connection, db_name):
     cursor.close()
     connection.commit()
     return None
+
+def write_data_single(connection, table, data):
+    fields = ""
+    values = ""
+    id = 0
+    params = []
+    anzahl = len(data)
+    counter = 0
+    for item in data:
+        if counter < (anzahl-1):
+            fields += item + ', '
+            values += '?, '
+        else:
+            fields += item
+            values += '?'
+        params.append(data[item])
+        counter += 1
+    sSQL = 'INSERT INTO ' + table + '('+fields+') VALUES('+values+');'
+    write_cursor = connection.cursor()
+    write_cursor.execute(sSQL, params)
+    write_cursor.commit()
+    id = write_cursor.lastrowid
+    write_cursor.close()
+    return id
