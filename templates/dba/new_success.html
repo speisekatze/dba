@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block script %}
+<script>
+    $( document ).ready(function() {
+    });
+</script>
+
+{% endblock script %}
+{% block content %}
+{% if debugmessage %}
+<fieldset>
+    <legend>Debugmessage</legend>
+    <pre>
+    {{debugmessage}}
+    </pre>
+</fieldset>
+{% endif %}
+    <div style="border: 1px solid #cdd;">
+    <h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
+        <span class="headline" style="text-align:left;width:80%;">Erfolg</span>
+    </h3>
+    </div>
+    <br class="end" />
+    <div class="">
+        Eintrag im DBT bearbeiten: <a href="http://dev.logodata.intern/dbt/index.php?request=ausgabe&id={{ dbtid }}" target="_blank">Klick</a>
+    </div>
+{% endblock content %}
