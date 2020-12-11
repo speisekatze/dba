@@ -1,13 +1,14 @@
 # maybe later - get_object_or_404
 from django.conf import settings
 from django.shortcuts import render, redirect
-from datetime import date
+from datetime import date, datetime#
 # maybe later - reverse
 from django.views import generic
 from src.config import config
 from .app import general
 from .app.dblist import DbListApp
 from .forms import NewDbForm
+from src.db import mysql
 
 
 # Create your views here.
@@ -42,15 +43,58 @@ class NewDBView(generic.FormView):
     template_name = 'dba/newdb.html'
     conf = config(settings.DBA_CONFIG_FILE)
     form_class = NewDbForm
+    success_url = '/dba/newdb/success'
 
-    def get(self, request, *args, **kwargs):
-        context = get_default_data()
+    def form_valid(self, form):
+        dbt = general.connect_dbt(self.conf)
+        # grund_id, eingespielt_von, eingespielt_am, verschluesselt, passwort, ziel_db, umgebung_dev, umgebung_beta, umgebung_release, createuser, createtime
+        data = {}
+        data['kunden_id'] = form.cleaned_data['kunden']
+        data['grund_id'] = 1
+        data['eingespielt_von'] = ''.join(["%0.2x" % int(x) for x in self.request.user.objid])
+        data['eingespielt_am'] = int(datetime.now().timestamp())
+        if form.cleaned_data['passwort'] != '':
+            form.cleaned_data['verschluesselt'] = 'j'
+            data['passwort'] = form.cleaned_data['passwort']
+        data['ziel_db'] = form.cleaned_data['host_name'] + '\\' + form.cleaned_data['instance_name'] + form.cleaned_data['db_name']
+        if 'dev' in form.cleaned_data['server']:
+            data['umgebung_dev'] = form.cleaned_data['u_name']
+        if 'beta' in form.cleaned_data['server']:
+            data['umgebung_beta'] = form.cleaned_data['u_name']
+        if 'release' in form.cleaned_data['server']:
+            data['umgebung_release'] = form.cleaned_data['u_name']
+        data['createuser'] = ''.join(["%0.2x" % int(x) for x in self.request.user.objid])
+        data['createtime'] = int(datetime.now().timestamp())
+        print(data)
+        
+        id = mysql.write_data_single(dbt, 'Datenbank', data)
+        #id = 100
+        self.success_url += '/'+str(id)
+        return super(NewDBView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        print(self.request)
+        return super(NewDBView, self).form_invalid(form)
+
+    def get_initial(self):
+        initial = super(NewDBView, self).get_initial()
+        initial.update(get_default_data())
+        initial['seite'] = 'Neue Datenbank'
+        initial['host_name'] = self.kwargs['host']
+        initial['instance_name'] = self.kwargs['instance']
+        initial['form'] = self.form_class(self.kwargs)
+        initial['backlink'] = '/dba/'
+        return initial
+
+class NewDBSuccess(generic.TemplateView):
+    template_name = 'dba/new_success.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(get_default_data())
         context['seite'] = 'Neue Datenbank'
-        context['host_name'] = kwargs['host']
-        context['instance_name'] = kwargs['instance']
-        context['form'] = self.form_class
-        return render(request, self.template_name, context)
-
+        print(context)
+        return context
 
 class DbListView(generic.FormView):
     template_name = 'dba/index.html'
@@ -70,6 +114,9 @@ class DbListView(generic.FormView):
         context = get_default_data()
         context['seite'] = self.seite
         context['host_list'] = host_list
+        #print(type(self.request.user.objid))
+        #if self.request.user.objid:
+        #    print(''.join(["%0.2x" % int(x) for x in self.request.user.objid]))
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
