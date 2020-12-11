@@ -23,12 +23,14 @@ class NewDbForm(forms.Form):
     conf = config(settings.DBA_CONFIG_FILE)
     db_name = forms.CharField(label='Datenbankname')
     u_name = forms.CharField(label='Umgebung')
-    server = forms.ChoiceField(label='Server',
+    server = forms.MultipleChoiceField(label='Server',
                                choices=[('dev', 'DEV'), ('beta', 'BETA'), ('release', 'RELEASE')],
                                widget=forms.CheckboxSelectMultiple)
     kunden = forms.ChoiceField(label='Kunden')
     quellen = forms.ChoiceField(label='Quellen', widget=forms.RadioSelect)
-    passwort = forms.CharField(label='Passwort zum Entpacken')
+    passwort = forms.CharField(label='Passwort zum Entpacken', required=False)
+    host_name = forms.CharField(widget=forms.HiddenInput())
+    instance_name = forms.CharField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         super(NewDbForm, self).__init__(*args, **kwargs)
@@ -39,7 +41,13 @@ class NewDbForm(forms.Form):
             k.append((kunde[0], kunde[1]))
         self.fields['kunden'].choices = k
         filenames = []
-        for root, d_names, f_names in os.walk(self.conf['dba']['dump']):
+        instance = ''
+        if 'initial' in kwargs:
+            print(kwargs)
+            instance = kwargs['initial']['instance_name']
+        if len(args) > 0:
+            instance = args[0]['instance']
+        for root, d_names, f_names in os.walk(self.conf['dba']['dump']+instance+'\\'):
             for f in f_names:
                 fname = os.path.join(root, f).replace('/', '\\')
                 filenames.append((fname, fname))
@@ -51,6 +59,7 @@ class NewDbForm(forms.Form):
         self.helper.label_class = 'left'
         self.helper.field_class = 'left'
         self.helper.field_template = 'field.html'
+        self.helper.use_custom_control = True
         self.helper.layout = Layout(
             Fieldset(
                 'Informationen',
@@ -60,6 +69,8 @@ class NewDbForm(forms.Form):
                 'kunden',
                 'passwort',
                 'quellen',
+                'host_name',
+                'instance_name',
             ),
             ButtonHolder(
                 Submit('submit', 'Senden')
