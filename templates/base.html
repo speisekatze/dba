@@ -28,7 +28,11 @@
             <div id="content">
                 <div id="currentStateMenu" style="width:10%">
                     <div class="currentStateMenuButton">
+                        {% if backlink %}
+                        <a href="{{backlink}}" title="Zurück">
+                        {% else %}
                         <a href="../" title="Zurück">
+                        {% endif %}
                           <img src="{% static "img/cancel_menu.png" %}" alt=""><br>
                           Zurück
                         </a>
