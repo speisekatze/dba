@@ -4,6 +4,41 @@
 {% block script %}
 <script>
     $( document ).ready(function() {
+        $('.custom-control.custom-radio').bind('click', {
+            msg: 'select'
+        }, function(event) {
+            if (event.target.value) {
+                v = event.target.value.split('\\')
+                a = v[v.length-1].split('.')[0]
+                d = new Date()
+                ds = ''
+                ds2 = ''
+                if (d.getDate() < 10) {
+                    ds += '0' + d.getDate().toString();
+                    ds2 = ds
+                } else {
+                    ds += d.getDate().toString();
+                    ds2 = ds
+                }
+                m = d.getMonth() + 1
+                if ( m < 10) {
+                    ds += '0' + m.toString();
+                    ds2 += '.0' + m.toString();
+                } else {
+                    ds += m.toString();
+                    ds2 += '.' + m.toString();
+                }
+                ds += d.getFullYear()
+                ds2 += '.' + d.getFullYear()
+                $('#id_db_name')[0].value = a +'_'+ ds
+                u = a.split('_')
+                us = ''
+                for (i=0; i<u.length; i++) {
+                    us += u[i][0].toUpperCase() + u[i].substring(1) + ' '
+                }
+                $('#id_u_name')[0].value =  us + '(' + ds2 + ')'
+            }
+        });
     });
 </script>
 
@@ -18,7 +53,7 @@
 </fieldset>
 {% endif %}
 <h3 id="filterMenu" class="menuHeadStatic" style="margin-top:-1px;">
-    <span class="headline" style="text-align:left;width:80%;">Neue Datenbank auf {{ host_name }} ({{host.driver}}) - {{ instance_name }}</span>
+    <span class="headline" style="text-align:left;width:80%;">Neue Datenbank auf {{ host_name }} ({{host_driver}}) - {{ instance_name }}</span>
 </h3>
 {% crispy form form.helper %}
 
