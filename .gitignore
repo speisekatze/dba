@@ -12,3 +12,4 @@ lib/
 *.bat
 Scripts/activate
 Scripts/Activate.ps1
+db.sqlite3
