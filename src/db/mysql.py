@@ -52,25 +52,14 @@ def drop(connection, db_name):
     return None
 
 def write_data_single(connection, table, data):
-    fields = ""
-    values = ""
     id = 0
-    params = []
-    anzahl = len(data)
-    counter = 0
-    for item in data:
-        if counter < (anzahl-1):
-            fields += item + ', '
-            values += '?, '
-        else:
-            fields += item
-            values += '?'
-        params.append(data[item])
-        counter += 1
-    sSQL = 'INSERT INTO ' + table + '('+fields+') VALUES('+values+');'
-    write_cursor = connection.cursor()
-    write_cursor.execute(sSQL, params)
-    write_cursor.commit()
+    sSQL = 'INSERT INTO ' + table + '('+ ', '.join([x for x in data]) +') VALUES('+ ', '.join(['%s' for x in data]) +');'
+    try:
+        write_cursor = connection.cursor()
+        write_cursor.execute(sSQL, [data[x] for x in data])
+    except mysql.connector.Error as err:
+        print("Something went wrong: {}".format(err))
+    connection.commit()
     id = write_cursor.lastrowid
     write_cursor.close()
     return id
