@@ -1,8 +1,8 @@
 {% load crispy_forms_field %}
-<br class="end">
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
+    <br class="end">
     {% if field|is_checkbox %}
         <div class="form-group{% if 'form-horizontal' in form_class %} row{% endif %}">
         {% if label_class %}
