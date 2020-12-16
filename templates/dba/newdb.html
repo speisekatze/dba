@@ -37,7 +37,13 @@
                     us += u[i][0].toUpperCase() + u[i].substring(1) + ' '
                 }
                 $('#id_u_name')[0].value =  us + '(' + ds2 + ')'
+                $('#id_kunden_name')[0].value = $('#id_kunden')[0].options[$('#id_kunden')[0].options.selectedIndex].text
             }
+        });
+        $('.form-control.select#id_kunden').bind('change', {
+            msg: 'select'
+        }, function(event) {
+            $('#id_kunden_name')[0].value = $('#id_kunden')[0].options[$('#id_kunden')[0].options.selectedIndex].text
         });
     });
 </script>
