@@ -48,7 +48,13 @@ class NewDbForm(forms.Form):
             instance = kwargs['initial']['instance_name']
         if len(args) > 0:
             instance = args[0]['instance']
-        for root, d_names, f_names in os.walk(self.conf['dba']['dump']+instance+'\\'):
+        driver = kwargs['initial']['host_driver']
+        print(self.conf['dba']['dump'][driver])
+        dump_path = self.conf['dba']['dump'][driver]
+        if driver == 'MSSQL':
+            dump_path += instance+'\\' 
+        print(dump_path)
+        for root, d_names, f_names in os.walk(dump_path):
             for f in f_names:
                 fname = os.path.join(root, f).replace('/', '\\')
                 filenames.append((fname, fname))
