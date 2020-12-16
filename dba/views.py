@@ -8,7 +8,7 @@ from src.config import config
 from .app import general
 from .app.dblist import DbListApp
 from .forms import NewDbForm
-from src.db import mysql
+from src.db import mysql, sqlite
 
 
 # Create your views here.
@@ -56,24 +56,41 @@ class NewDBView(generic.FormView):
         if form.cleaned_data['passwort'] != '':
             form.cleaned_data['verschluesselt'] = 'j'
             data['passwort'] = form.cleaned_data['passwort']
-        data['ziel_db'] = form.cleaned_data['host_name'] + '\\' + form.cleaned_data['instance_name'] + form.cleaned_data['db_name']
+        data['ziel_db'] = form.cleaned_data['host_name'] + '\\' + form.cleaned_data['instance_name'] + ' - ' + form.cleaned_data['db_name']
         if 'dev' in form.cleaned_data['server']:
             data['umgebung_dev'] = form.cleaned_data['u_name']
+            self.umgebung_anlegen(self.conf['dba']['lde']['dev'], form)
         if 'beta' in form.cleaned_data['server']:
             data['umgebung_beta'] = form.cleaned_data['u_name']
+            self.umgebung_anlegen(self.conf['dba']['lde']['beta'], form)
         if 'release' in form.cleaned_data['server']:
             data['umgebung_release'] = form.cleaned_data['u_name']
+            self.umgebung_anlegen(self.conf['dba']['lde']['release'], form)
         data['createuser'] = ''.join(["%0.2x" % int(x) for x in self.request.user.objid])
         data['createtime'] = int(datetime.now().timestamp())
-        print(data)
-        
+        #print(data)
         id = mysql.write_data_single(dbt, 'Datenbank', data)
-        #id = 100
         self.success_url += '/'+str(id)
         return super(NewDBView, self).form_valid(form)
 
+    def umgebung_anlegen(self, db_file_name, form):
+        lde_db = sqlite.create(db_file_name)
+        umgebung = sqlite.write_data_single(lde_db, 'umgebung', {'umgebungs_name': form.cleaned_data['u_name']})
+        db = sqlite.query(lde_db, 'copy', [umgebung, 316], commit=True)
+
+        update = { 'conf_value': form.cleaned_data['host_name'] + '\\' + form.cleaned_data['instance_name']}
+        sqlite.update(lde_db, 'lde_conf', {'ind_umgebung': umgebung, 'conf_int_name': 'tmp_db_host'}, update)
+        
+        update = { 'conf_value': form.cleaned_data['db_name']}
+        sqlite.update(lde_db, 'lde_conf', {'ind_umgebung': umgebung, 'conf_int_name': 'tablespace'}, update)
+        
+        update = { 'conf_value': form.cleaned_data['kunden_name'].lower()}
+        sqlite.update(lde_db, 'lde_conf', {'ind_umgebung': umgebung, 'conf_int_name': 'kassenSchnittstelle'}, update)
+
+        update = { 'conf_value': 'L:\\Dokumente\\_' + form.cleaned_data['kunden_name'].lower() + '\\'}
+        sqlite.update(lde_db, 'lde_conf', {'ind_umgebung': umgebung, 'conf_int_name': 'dok_dir_client'}, update)
+
     def form_invalid(self, form):
-        print(self.request)
         return super(NewDBView, self).form_invalid(form)
 
     def get_initial(self):
@@ -82,9 +99,21 @@ class NewDBView(generic.FormView):
         initial['seite'] = 'Neue Datenbank'
         initial['host_name'] = self.kwargs['host']
         initial['instance_name'] = self.kwargs['instance']
-        initial['form'] = self.form_class(self.kwargs)
+        #initial['form'] = self.form_class(self.kwargs)
         initial['backlink'] = '/dba/'
+        initial['host_driver'] = [x for x in self.conf['dba']['database']['hosts'] if initial['host_name'] in x.values()][0]['driver']
         return initial
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(get_default_data())
+        context['seite'] = 'Neue Datenbank'
+        context['host_name'] = self.kwargs['host']
+        context['instance_name'] = self.kwargs['instance']
+        #context['form'] = self.form_class(self.kwargs)
+        context['backlink'] = '/dba/'
+        context['host_driver'] = [x for x in self.conf['dba']['database']['hosts'] if context['host_name'] in x.values()][0]['driver']
+        return context
 
 class NewDBSuccess(generic.TemplateView):
     template_name = 'dba/new_success.html'
@@ -93,7 +122,6 @@ class NewDBSuccess(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(get_default_data())
         context['seite'] = 'Neue Datenbank'
-        print(context)
         return context
 
 class DbListView(generic.FormView):
@@ -105,7 +133,6 @@ class DbListView(generic.FormView):
         if not request.user.is_authenticated:
             settings.LOGIN_REDIRECT_URL = '/dba'
             return redirect('login')
-        print(request.user.is_dsb)
         if not request.user.is_dsb and not request.user.is_superuser and not request.user.is_gf:
             print('user error')
             return redirect('passwd:index')
@@ -114,9 +141,6 @@ class DbListView(generic.FormView):
         context = get_default_data()
         context['seite'] = self.seite
         context['host_list'] = host_list
-        #print(type(self.request.user.objid))
-        #if self.request.user.objid:
-        #    print(''.join(["%0.2x" % int(x) for x in self.request.user.objid]))
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
