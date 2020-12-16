@@ -6,7 +6,7 @@ from django import forms
 from src.config import config
 from src.db import mysql
 from dba.app import general
-
+import traceback
 
 class SucheForm(forms.Form):
 
@@ -31,19 +31,20 @@ class NewDbForm(forms.Form):
     passwort = forms.CharField(label='Passwort zum Entpacken', required=False)
     host_name = forms.CharField(widget=forms.HiddenInput())
     instance_name = forms.CharField(widget=forms.HiddenInput())
+    kunden_name = forms.CharField(widget=forms.HiddenInput())
+    host_driver = forms.CharField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         super(NewDbForm, self).__init__(*args, **kwargs)
         dbt = general.connect_dbt(self.conf)
         kunden = mysql.query(dbt, 'get_kunden')
-        k = []
+        k = [(0, 'Bitte auswählen')]
         for kunde in kunden:
             k.append((kunde[0], kunde[1]))
         self.fields['kunden'].choices = k
         filenames = []
         instance = ''
         if 'initial' in kwargs:
-            print(kwargs)
             instance = kwargs['initial']['instance_name']
         if len(args) > 0:
             instance = args[0]['instance']
@@ -71,6 +72,8 @@ class NewDbForm(forms.Form):
                 'quellen',
                 'host_name',
                 'instance_name',
+                'kunden_name',
+                'host_driver',
             ),
             ButtonHolder(
                 Submit('submit', 'Senden')
