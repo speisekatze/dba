@@ -18,7 +18,11 @@ FROM sys.databases db \
                 GROUP BY database_id, type) mflog ON mflog.database_id = db.database_id \
     WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb') ORDER BY DB_NAME(db.database_id);",
     'simple': 'ALTER DATABASE {0} SET RECOVERY SIMPLE;',
-    'shrink': "DBCC SHRINKDATABASE (?, NOTRUNCATE);"
+    'shrink': "DBCC SHRINKDATABASE (?, NOTRUNCATE);",
+    'single_user_on': 'ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE',
+    'import': "RESTORE DATABASE {db_name} FROM  DISK = N'F:\{instance}\{filename}' WITH  FILE = 1,  MOVE N'{data_name}' TO N'E:\{instance}\{db_name}.mdf',  MOVE N'{log_name}' TO N'L:\{instance}\{db_name}_log.ldf',  NOUNLOAD,  REPLACE,  STATS = 5",
+    'filelist': "RESTORE FILELISTONLY FROM  DISK = N'F:\{instance}\{filename}' WITH  FILE = 1, NOUNLOAD"
+
 }
 
 
@@ -111,3 +115,35 @@ def drop(connection, db_name):
     cursor.close()
     connection.commit()
     return None
+
+def import_db(connection, data):
+    dbs = find_in_table(connection, 'sys.databases', ' name = ?', [data['db_name']])
+    print(dbs)
+    single_on = False
+    cursor = connection.cursor()
+    s = queries['filelist'].format(instance=data['instance_name'], filename=data['filename'])
+    q = cursor.execute(s)
+    if q:
+        result = q.fetchall()
+    connection.commit()
+    
+    for row in result:
+        if row[2] == 'D':
+            data['data_name'] = row[0]
+        else:
+            data['log_name'] = row[0]
+
+    print(result)
+    imp_cursor = connection.cursor()
+    if len(dbs) > 0:
+        s = queries['single_user_on'].format(data['db_name'])
+        imp_cursor.execute(s)
+        single_on = True
+    s = queries['import'].format(db_name=data['db_name'], instance=data['instance_name'], filename=data['filename'], data_name=data['data_name'], log_name=data['log_name'])
+    imp_cursor.execute(s)
+    print(s)
+    if single_on:
+        s = queries['single_user_off'].format(data['db_name'])
+        imp_cursor.execute(s)
+        single_on = False
+    connection.commit()
