@@ -8,7 +8,7 @@ from src.config import config
 from .app import general
 from .app.dblist import DbListApp
 from .forms import NewDbForm
-from src.db import mysql, sqlite
+from src.db import mysql, sqlite, mssql
 
 
 # Create your views here.
@@ -70,6 +70,7 @@ class NewDBView(generic.FormView):
         data['createtime'] = int(datetime.now().timestamp())
         #print(data)
         id = mysql.write_data_single(dbt, 'Datenbank', data)
+        self.import_db(form.cleaned_data)
         self.success_url += '/'+str(id)
         return super(NewDBView, self).form_valid(form)
 
@@ -89,6 +90,16 @@ class NewDBView(generic.FormView):
 
         update = { 'conf_value': 'L:\\Dokumente\\_' + form.cleaned_data['kunden_name'].lower() + '\\'}
         sqlite.update(lde_db, 'lde_conf', {'ind_umgebung': umgebung, 'conf_int_name': 'dok_dir_client'}, update)
+
+    def import_db(self, data):
+        dblist = DbListApp(self.conf)
+        dblist.host_name = data['host_name']
+        dblist.driver = data['host_driver']
+        dblist.instance_name = data['instance_name']
+        connection = dblist.get_db_connection()
+        data['filename'] = data['quellen'].split('\\')[-1]
+        dblist.db.import_db(connection, data)
+        
 
     def form_invalid(self, form):
         return super(NewDBView, self).form_invalid(form)
@@ -205,7 +216,10 @@ class DbListView(generic.FormView):
             items['sum'] = db[3]
             items['add'] = db[4]
             if info:
-                items['delete'] = date.fromtimestamp(info[0])
+                if info[0] is None:
+                    items['delete'] = date.fromtimestamp(0)
+                else:
+                    items['delete'] = date.fromtimestamp(info[0])
                 items['dbtid'] = info[2]
                 items['delta'] = (items['delete'] - date.today()).days
             else:
