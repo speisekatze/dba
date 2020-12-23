@@ -1,4 +1,5 @@
 import pyodbc
+import time
 
 queries = {
     'db_list_size': "SELECT \
@@ -21,7 +22,9 @@ FROM sys.databases db \
     'shrink': "DBCC SHRINKDATABASE (?, NOTRUNCATE);",
     'single_user_on': 'ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE',
     'import': "RESTORE DATABASE {db_name} FROM  DISK = N'F:\{instance}\{filename}' WITH  FILE = 1,  MOVE N'{data_name}' TO N'E:\{instance}\{db_name}.mdf',  MOVE N'{log_name}' TO N'L:\{instance}\{db_name}_log.ldf',  NOUNLOAD,  REPLACE,  STATS = 5",
-    'filelist': "RESTORE FILELISTONLY FROM  DISK = N'F:\{instance}\{filename}' WITH  FILE = 1, NOUNLOAD"
+    'filelist': "RESTORE FILELISTONLY FROM  DISK = N'F:\{instance}\{filename}' WITH  FILE = 1, NOUNLOAD",
+    'single_user_off': "ALTER DATABASE {0} SET MULTI_USER",
+    'db_status': "SELECT * FROM sys.databases WHERE name = '{0}'",
 
 }
 
@@ -126,22 +129,23 @@ def import_db(connection, data):
     if q:
         result = q.fetchall()
     connection.commit()
-    
+    cursor.close()
     for row in result:
         if row[2] == 'D':
             data['data_name'] = row[0]
         else:
             data['log_name'] = row[0]
 
-    print(result)
     imp_cursor = connection.cursor()
     if len(dbs) > 0:
         s = queries['single_user_on'].format(data['db_name'])
         imp_cursor.execute(s)
         single_on = True
     s = queries['import'].format(db_name=data['db_name'], instance=data['instance_name'], filename=data['filename'], data_name=data['data_name'], log_name=data['log_name'])
-    imp_cursor.execute(s)
-    print(s)
+    restore = imp_cursor.execute(s)
+    while imp_cursor.nextset():
+        time.sleep(5)
+        pass
     if single_on:
         s = queries['single_user_off'].format(data['db_name'])
         imp_cursor.execute(s)
