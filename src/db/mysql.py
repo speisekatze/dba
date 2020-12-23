@@ -1,4 +1,5 @@
 import mysql.connector
+from src.ssh import ssh
 
 
 queries = {
@@ -63,3 +64,17 @@ def write_data_single(connection, table, data):
     id = write_cursor.lastrowid
     write_cursor.close()
     return id
+
+def import_db(connection, data):
+    client = ssh('MySQL')
+    client.open()
+    filter_dump_command = "cat /srv/mariadb/tmp/{0} |grep -v '^CREATE DATABASE\|^USE' >/srv/mariadb/tmp/tmp.sql".format(data['filename'])
+    m, e = client.cmd(filter_dump_command)
+    cursor = connection.cursor()
+    s = "CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_german1_ci".format(data['db_name'])
+    cursor.execute(s)
+    connection.commit()
+    cursor.close()
+    import_command = "mysql --silent --user={0} --password={1} {2} < /srv/mariadb/tmp/tmp.sql".format(client.conf['db_user'], client.conf['db_pass'], data['db_name'])
+    m, e = client.cmd(import_command)
+    m, e = client.cmd("rm /srv/mariadb/tmp/tmp.sql")
