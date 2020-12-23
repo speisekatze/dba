@@ -43,7 +43,7 @@ def prepare_config(configuration, host, instance=None):
                 conf['instance'] = prepare_instance_config(item, instance)
             conf['user'] = item['user']
             conf['password'] = item['password']
-            if 'instance' in conf:
+            if 'instance' in conf and conf['instance'] is not None:
                 if 'user' in conf['instance'] and 'password' in conf['instance']:
                     conf['user'] = conf['instance']['user']
                     conf['password'] = conf['instance']['password']
