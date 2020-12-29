@@ -16,8 +16,8 @@ class ssh:
         self.connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.connection.connect(self.conf['host'], username=self.conf['user'], password=self.conf['pass'])
 
-    def cmd(self, command):
-        stdin, stdout, stderr = self.connection.exec_command(command, get_pty=True)
+    def cmd(self, command, env=None):
+        stdin, stdout, stderr = self.connection.exec_command(command, get_pty=True, environment=env)
         stdin.channel.shutdown_write()
         messages = [x for x in stdout]
         error = [x for x in stderr]
