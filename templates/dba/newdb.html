@@ -30,7 +30,11 @@
                 }
                 ds += d.getFullYear()
                 ds2 += '.' + d.getFullYear()
-                $('#id_db_name')[0].value = a +'_'+ ds
+                if ($('#id_host_driver')[0].value != 'Oracle') {
+                    $('#id_db_name')[0].value = a +'_'+ ds
+                } else {
+                    $('#id_db_name')[0].value = a
+                }
                 u = a.split('_')
                 us = ''
                 for (i=0; i<u.length; i++) {
