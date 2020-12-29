@@ -1,4 +1,5 @@
 import cx_Oracle
+from src.ssh import ssh
 
 queries = {
     'db_list_size': "SELECT DISTINCT owner, \
@@ -64,3 +65,26 @@ def drop(connection, db_name):
     cursor.close()
     connection.commit()
     return None
+
+def import_db(connection, data):
+    client = ssh('Oracle')
+    client.open()
+    print(data)
+    sqlfile_string = '/oracle/product/12.2.0/dbhome_1/bin/impdp \\"sys/{0}@192.168.1.219:1521/orcl as sysdba\\" DIRECTORY=logodata DUMPFILE={1} SQLFILE={1}.sql'
+    import_string = '/oracle/product/12.2.0/dbhome_1/bin/impdp \\"sys/{0}@192.168.1.219:1521/orcl AS SYSDBA\\" DIRECTORY=logodata DUMPFILE={1} REMAP_SCHEMA={2}:{3} REMAP_TABLESPACE={4}:{5} TABLE_EXISTS_ACTION=REPLACE LOGFILE=imp_{1}.log'
+    sqlfile_command = sqlfile_string.format(client.conf['db_pass'], data['filename'])
+    env_dict = {
+        'ORACLE_HOME': '/oracle/product/12.2.0/dbhome_1',
+        'LD_LIBRARY_PATH': '/oracle/product/12.2.0/dbhome_1/lib',
+        'PATH': '/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/oracle/.local/bin:/home/oracle/bin:/oracle/product/12.2.0/dbhome_1/bin',
+        'ORACLE_BASE': '/oracle',
+    }
+
+    m, e = client.cmd(sqlfile_command, env=env_dict)
+    m, e = client.cmd('grep -m 1 "TABLESPACE" /oradata/share/{0}.sql'.format(data['filename']))
+    tablespace = m[0].split('"')[1]
+    m, e = client.cmd('grep -m 1 "CREATE TABLE" /oradata/share/{0}.sql'.format(data['filename']))
+    schema = m[0].split('"')[1]
+    import_command = import_string.format(client.conf['db_pass'], data['filename'], schema, data['db_name'], tablespace, data['db_name'])
+    m, e = client.cmd(import_command, env=env_dict)
+    m, e = client.cmd('rm /oradata/share/{0}.sql'.format(data['filename']))
