@@ -21,6 +21,16 @@
             $('#suchen').click();
         });
     });
+    $(window).scroll(function(e){ 
+        var $el = $('#navigation'); 
+        var isPositionFixed = ($el.css('position') == 'fixed');
+        if ($(this).scrollTop() > 200 && !isPositionFixed){ 
+            $el.css({'position': 'fixed', 'top': '0px'}); 
+        }
+        if ($(this).scrollTop() < 200 && isPositionFixed){
+            $el.css({'position': 'static', 'top': '0px'}); 
+        } 
+        });
 </script>
 
 {% endblock script %}
@@ -74,6 +84,7 @@
         </a>
         <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Auswahl" name="select">
         <input class="navigationButton" type="submit" style="background-image: url({% static "img/loeschen.png" %});" value="Löschen" name="drop">
+        <input class="navigationButton" type="submit" style="background-image: url({% static "img/loeschen.png" %});" value="Umgebungen Löschen" name="remove_env">
         {% if db_driver == 'MSSQL' %}
             <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Verkleinern" name="shrink">
             <input class="navigationButton" type="submit" style="background-image: url({% static "img/menuAuswahl.png" %});" value="Wiederherstellungsmodell" name="simple">
@@ -98,9 +109,11 @@
             {% for db in db_list %}
             <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %} clickable" style="border: 1px solid black">
                 <td><input type="radio" name="db_name" style="display: none;" value="{{ db.name }}" />{{ db.name }}</td>
-                <td>{{ db.umgebung|linebreaksbr }}</td>
+                <td><input type="radio" name="devid" style="display: none;" value="{{ db.devid }}" />
+                    <input type="radio" name="betaid" style="display: none;" value="{{ db.betaid }}" />
+                    <input type="radio" name="releaseid" style="display: none;" value="{{ db.releaseid }}" />{{ db.umgebung|linebreaksbr }}</td>
                 {% if db.delta < -8999 %}
-                <td style="color: white; background-color: red;">{{ db.delete }}</td>
+                <td style="color: white; background-color: red;"><a style="color: white;" target="_blank" href="http://dev.logodata.intern/dbt/index.php?request=ausgabe&id={{ db.dbtid }}">{{ db.delete }}</a></td>
                 {% elif db.delta < 0 %}
                 <td><a style="color: red;" target="_blank" href="http://dev.logodata.intern/dbt/index.php?request=ausgabe&id={{ db.dbtid }}">{{ db.delete }}</a></td>
                 {% else %}
@@ -114,6 +127,30 @@
                 <td style="text-align: right; color: green;">{{ db.sum }}</td>
                 {% endif %}
                 <td>{{ db.add }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr><td colspan="5"></td></tr>
+        </tfoot>
+    </table>
+    <br class="end">
+{% endif %}
+{% if env_list %}
+    <table id="db_table" class="ldeTable" style="width: 100%;">
+        <caption>Umgebungsliste (Umgebungen ohne Datenbanken)</caption>
+        <thead>
+            <tr>
+                <th id="tblName" width="200">Server</th>
+                <th id="tblUmgebung" width="550">Umgebung</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for env in env_list %}
+            <tr class="{% cycle 'ldeTableRow' 'ldeTableRowAlternative' %} clickable" style="border: 1px solid black">
+                <td><input type="radio" name="envid" style="display: none;" value="{{ env.id }}" />
+                    <input type="radio" name="envserver" style="display: none;" value="{{ env.server }}" />{{ env.server }}</td>
+                <td>{{ env.name|linebreaksbr }}</td>
             </tr>
             {% endfor %}
         </tbody>
