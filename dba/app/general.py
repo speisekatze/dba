@@ -62,10 +62,14 @@ def prepare_instance_config(item, instance):
         print('Fehler')
     return conf
 
+def umgebung_loeschen(conf, lde_db, envid):
+    db = sqlite.create(conf['dba']['lde'][lde_db])
+    db = sqlite.query(db, 'remove', [envid])
 
 def umgebungen_laden(conf, lde_db, host, instance):
     dev_db = sqlite.create(conf['dba']['lde'][lde_db])
     db_conf = prepare_config(conf, host, instance)
+    db = None
     if db_conf['driver'] == 'MSSQL':
         cond = ''
         if instance is None:
@@ -73,13 +77,22 @@ def umgebungen_laden(conf, lde_db, host, instance):
         else:
             cond = host + '\\' + instance
         db = sqlite.query(dev_db, 'umgebungen', [cond])
-    else:
+    if db_conf['driver'] == 'Oracle':
+        if instance is None:
+            cond = 'none'
+        else:
+            cond = db_conf['lde_conf']
+        db = sqlite.query(dev_db, 'umgebungen', [cond])
+    if db_conf['driver'] == 'MySQL':
         db = sqlite.query(dev_db, 'umgebungen', [db_conf['lde_conf']])
     return db
 
 
 def umgebung_suchen(umgebungen, db_name):
+    found = []
     for umgebung in umgebungen:
-        if db_name == umgebung[0].decode("cp1252"):
-            return umgebung[1].decode("cp1252")
-    return ''
+        if db_name.upper() == umgebung[0].decode("cp1252").upper():
+            found.append([umgebung[1].decode("cp1252"), umgebung[2]])
+    if len(found) > 0:
+        return found
+    return [['', -1],]
