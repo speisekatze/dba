@@ -1,7 +1,7 @@
 import sqlite3
 
 queries = {
-    'umgebungen': "SELECT conf_value,umgebungs_name FROM lde_conf c \
+    'umgebungen': "SELECT conf_value,umgebungs_name, c.ind_umgebung AS uid FROM lde_conf c \
 LEFT JOIN umgebung u ON (c.ind_umgebung = u.ind_umgebung) \
 WHERE conf_int_name = 'tablespace' AND c.ind_umgebung IN \
     (select ind_umgebung from lde_conf WHERE conf_int_name = 'tmp_db_host' \
@@ -9,6 +9,7 @@ WHERE conf_int_name = 'tablespace' AND c.ind_umgebung IN \
     'copy': "INSERT INTO lde_conf (conf_int_name, conf_value, conf_description, type, ind_umgebung) \
 SELECT conf_int_name, conf_value, conf_description, type, ? \
 FROM lde_conf WHERE ind_umgebung=?", 
+    'remove': "DELETE FROM lde_conf WHERE ind_umgebung=?",
 }
 
 
