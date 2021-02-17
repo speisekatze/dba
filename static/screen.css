@@ -199,7 +199,8 @@ label.right {
 	font-weight: 700;
 	margin-bottom: 0;
 	width: 100%;
-	float: left
+	float: left;
+	background-color: white;
 }
 
 div.function {
