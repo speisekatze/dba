@@ -54,8 +54,9 @@ class NewDbForm(forms.Form):
             dump_path += instance+'\\' 
         for root, d_names, f_names in os.walk(dump_path):
             for f in f_names:
-                fname = os.path.join(root, f).replace('/', '\\')
-                filenames.append((fname, fname))
+                if f.split('.')[-1] in ['bak', 'sql', 'dmp']:
+                    fname = os.path.join(root, f).replace('/', '\\')
+                    filenames.append((fname, fname))
         self.fields['quellen'].choices = filenames
 
         self.helper = FormHelper
